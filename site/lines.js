@@ -53,7 +53,12 @@ window.HIKER_LINES = {
 		"life happens wherever you are, whether you make it or not.",
 		"hows it going?",
 		"i like when its quiet.",
-		"you seem familiar."
+		"you seem familiar.",
+		"those mushrooms look delicious!",
+		"check out those mushrooms!",
+		"rain is coming.",
+		"i feel like its gonna rain.",
+		"i think it might rain."
 	],
 	/* same, but only while it is night */
 	night: [
