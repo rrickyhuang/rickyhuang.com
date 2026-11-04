@@ -40,7 +40,7 @@
   function arm(ms) { clearTimeout(hideT); hideT = setTimeout(hide, ms) }
   function show() {
     tapN++;
-    if (typeof nightEnd !== 'undefined' && nightEnd) { tapN--; endNight(); speak(words('ok. lights on.'), 2600); return }
+    if (typeof nightEnd !== 'undefined' && nightEnd) { tapN--; endNight(); speak(words('i love a good sunrise.'), 2600); return }
     if (typeof egg === 'function' && tapN % 15 === 0) { egg(); return }
     var html, ph = null, ms;
     if (tapN === 1) { html = words(GREET); ms = 4600 }
