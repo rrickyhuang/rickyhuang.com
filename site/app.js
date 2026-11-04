@@ -167,7 +167,7 @@
     stop = bed('lowpass', 420, .7, .04, 2.5);
     T.at(function () { speak(words(nt || nightEl ? 'fog at night. very spooky.' : 'oh. fog.'), 2800) }, 300);
     T.at(function () { f.classList.add('lift'); if (stop) stop(3.4) }, 5400);
-    T.at(function () { speak(words(nightEl ? 'and its gone. still dark though.' : 'and its gone. as you were.'), 4200) }, 7400);
+    T.at(function () { speak(words(nightEl ? 'like ships passing in the night.' : 'gone with the wind.'), 4200) }, 7400);
     T.at(function () { fogEnd() }, 9800);
     fogEnd = function () { T.clear(); fogEnd = null; if (stop) stop(.6); gone(f, 1200) }
   };
