@@ -1515,14 +1515,11 @@ li:hover .horn path:nth-child(3) {
 	transition: opacity 1.8s ease
 }
 
-/* glow layer lives in document space so it scrolls natively with the mushrooms */
+/* glow layer lives in document space (body is position:relative) so it scrolls natively with the mushrooms.
+   overflow:hidden keeps glows/motes near the edge from adding scrollable overflow (iOS ignores body overflow-x:hidden) */
 .eff.efa {
 	position: absolute;
-	inset: auto;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 0
+	overflow: hidden
 }
 
 .eff.in {
