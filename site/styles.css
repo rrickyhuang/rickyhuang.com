@@ -969,7 +969,8 @@ li:hover .horn path:nth-child(3) {
 
 .nite .m {
 	width: 1.3rem;
-	height: 1.3rem
+	height: 1.3rem;
+	translate: 0 8px /* sit on the label's centre line while the 44px box stays above the bio */
 }
 
 .nite:not(:disabled) {
@@ -985,8 +986,13 @@ li:hover .horn path:nth-child(3) {
 }
 
 .nite:focus-visible {
+	outline: 0
+}
+
+.nite:focus-visible .m {
 	outline: 2px solid var(--acc);
-	outline-offset: -5px
+	outline-offset: 4px;
+	border-radius: 50%
 }
 
 .nite.wake .m {
