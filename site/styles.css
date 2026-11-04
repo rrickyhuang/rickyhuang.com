@@ -230,7 +230,22 @@ font:600 .62rem/1 "Instrument Sans",sans-serif;letter-spacing:.12em;text-transfo
 .estamp{width:min(60vw,12rem);margin:calc(min(60vw,12rem)/-2) 0 0 calc(min(60vw,12rem)/-2)}.estamp.ondark{mix-blend-mode:normal;color:#EDB9A0}.eggbar span{display:none}
 .eggbar button{padding:.5rem .6rem}}
 @media (prefers-reduced-motion:reduce){.em,.estamp,.eflag .fl,.eflag .cl,.eumb{animation-duration:.01ms!important;animation-iteration-count:1!important}.efog i{animation:none;translate:0 0}}
-.land{position:relative;z-index:2;margin:1.15rem 0 0;max-width:46ch;font:400 .72rem/1.55 "Instrument Sans",sans-serif;color:color-mix(in srgb,var(--bg) 84%,var(--deep))}
-.land a{color:inherit;text-decoration:underline;text-decoration-color:var(--acc);text-decoration-thickness:1px;text-underline-offset:3px}
-.land a:hover,.land a:focus-visible{text-decoration-thickness:2px}
-.land .nm{font-family:"Noto Land","Instrument Sans",sans-serif}
+
+/* land acknowledgement: card on the location label in the header rule */
+.pr .hdr .lab .loc{position:relative;pointer-events:auto}
+.locb{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;line-height:inherit;
+text-decoration:underline dotted;text-decoration-color:var(--acc);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.locb:focus-visible{outline:2px solid var(--acc);outline-offset:4px;border-radius:2px}
+.ack{position:absolute;left:0;top:calc(100% + .4rem + 12px);z-index:6;box-sizing:border-box;width:min(21rem,calc(100vw - 2*var(--m)));
+background:#F4F2E4;color:var(--ink);border:1.5px solid var(--ink);border-radius:16px;padding:.8rem 1rem .9rem;
+font:400 .86rem/1.5 "Instrument Sans",sans-serif;letter-spacing:0;text-transform:none;
+filter:drop-shadow(2.5px 2.5px 0 rgba(20,38,29,.92));
+opacity:0;visibility:hidden;scale:.94;translate:0 -4px;transform-origin:1.4rem 0;
+transition:opacity .16s ease,scale .2s ease,translate .2s ease,visibility 0s linear .2s}
+.ack::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:calc(.4rem + 14px)}
+.ack::after{content:"";position:absolute;left:1.2rem;bottom:100%;width:11px;height:11px;background:#F4F2E4;border:1.5px solid var(--ink);border-bottom:0;border-right:0;transform:translate(-50%,6px) rotate(45deg)}
+.loc.open .ack{opacity:1;visibility:visible;scale:1;translate:0 0;transition-delay:0s}
+@media (hover:hover){.loc:hover .ack{opacity:1;visibility:visible;scale:1;translate:0 0;transition-delay:0s}}
+.ack a{color:inherit;text-decoration:underline;text-decoration-color:var(--acc);text-decoration-thickness:1.5px;text-underline-offset:3px}
+.ack a:hover,.ack a:focus-visible{text-decoration-thickness:2.5px}
+.ack .nm{font-family:"Noto Land","Instrument Sans",sans-serif}

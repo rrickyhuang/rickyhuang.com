@@ -295,3 +295,10 @@ function frame(t){
  requestAnimationFrame(frame)}
 if(!reduce)requestAnimationFrame(frame);else hk.style.setProperty('--x','0px');
 })();
+(function(){
+var loc=document.querySelector('.loc'),b=loc&&loc.querySelector('.locb');if(!b)return;
+function set(o){loc.classList.toggle('open',o);b.setAttribute('aria-expanded',o?'true':'false')}
+b.addEventListener('click',function(e){e.stopPropagation();set(!loc.classList.contains('open'))});
+document.addEventListener('click',function(e){if(!loc.contains(e.target))set(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&loc.classList.contains('open')){set(false);b.focus()}});
+})();
