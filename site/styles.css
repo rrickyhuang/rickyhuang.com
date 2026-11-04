@@ -1,3 +1,4 @@
+@font-face{font-family:'Noto Land';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/noto-sans-land-400.woff2) format('woff2');}
 :root{--bg:#E7E7D3;--ink:#26301E;--sec:#7E8A52;--acc:#BF4F2D;--deep:#2E3B21;--spot:#E7E7D3;color-scheme:light}
 @font-face{font-family:'Young Serif';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/young-serif-400.woff2) format('woff2');}@font-face{font-family:'Instrument Sans';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/instrument-sans-400.woff2) format('woff2');}@font-face{font-family:'Instrument Sans';font-style:normal;font-weight:600;font-display:swap;src:url(assets/fonts/instrument-sans-600.woff2) format('woff2');}
 *{box-sizing:border-box}
@@ -229,3 +230,7 @@ font:600 .62rem/1 "Instrument Sans",sans-serif;letter-spacing:.12em;text-transfo
 .estamp{width:min(60vw,12rem);margin:calc(min(60vw,12rem)/-2) 0 0 calc(min(60vw,12rem)/-2)}.estamp.ondark{mix-blend-mode:normal;color:#EDB9A0}.eggbar span{display:none}
 .eggbar button{padding:.5rem .6rem}}
 @media (prefers-reduced-motion:reduce){.em,.estamp,.eflag .fl,.eflag .cl,.eumb{animation-duration:.01ms!important;animation-iteration-count:1!important}.efog i{animation:none;translate:0 0}}
+.land{position:relative;z-index:2;margin:1.15rem 0 0;max-width:46ch;font:400 .72rem/1.55 "Instrument Sans",sans-serif;color:color-mix(in srgb,var(--bg) 84%,var(--deep))}
+.land a{color:inherit;text-decoration:underline;text-decoration-color:var(--acc);text-decoration-thickness:1px;text-underline-offset:3px}
+.land a:hover,.land a:focus-visible{text-decoration-thickness:2px}
+.land .nm{font-family:"Noto Land","Instrument Sans",sans-serif}
