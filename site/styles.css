@@ -1590,14 +1590,6 @@ li:hover .horn path:nth-child(3) {
 	background: radial-gradient(closest-side, hsl(var(--hue) 72% 62% / .4), hsl(var(--hue) 72% 56% / .12) 58%, transparent)
 }
 
-/* keyboard focus on the special mushroom, drawn above the dark layer so it can be found at night */
-.eff .eg.fo::after {
-	content: "";
-	position: absolute;
-	inset: -5px;
-	border: 2px solid hsl(var(--hue) 85% 78%);
-	border-radius: 50%
-}
 
 .eff .eg .gl {
 	fill: none;

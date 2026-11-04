@@ -185,7 +185,7 @@
   /* ---- night: click every web link once; stays dark until the odd mushroom in the about section is tapped (below) ---- */
   eggs.night = function () {
     if (nightEnd) return;
-    var first = !nmOn; unlockNight();
+    unlockNight();
     var T = timers(), d = el('div', 'edark'), f = el('div', 'eff'), i, beam = el('i', 'ebeam'), lamp = el('i', 'elamp'), glows = [], alive = true, raf = 0, cr = null, lastG = performance.now() / 1000, nextMote = 0;
     for (i = 0; i < 10; i++) { var ff = el('i', 'ff'); ff.style.cssText = 'left:' + (Math.random() * 96 + 2).toFixed(0) + '%;top:' + (Math.random() * 90 + 4).toFixed(0) + '%;--dx:' + ((Math.random() * 80 - 40) | 0) + 'px;--dy:' + ((Math.random() * 60 - 30) | 0) + 'px;--t:' + (5 + Math.random() * 5).toFixed(1) + 's;--w:' + (1.6 + Math.random() * 2.4).toFixed(1) + 's;animation-delay:' + (-Math.random() * 6).toFixed(1) + 's,' + (-Math.random() * 3).toFixed(1) + 's'; f.appendChild(ff) }
     f.appendChild(beam); f.appendChild(lamp);
@@ -216,7 +216,7 @@
         if (tt > p.nf) { p.fl = 1; p.nf = tt + 5 + Math.random() * 12 } p.fl = Math.max(0, p.fl - dtg * 2.2);
         var s = Math.sin(tt / p.per * 6.283 + p.ph), pu = .74 + .26 * (s * s * (s < 0 ? .6 : 1) + .2), sz = Math.min(1.25, Math.max(.6, q.width / 16)),
           b = Math.min(1, p.b * sz * pu * (1 - .5 * p.fl)), gs = gl.style;
-        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + q.left.toFixed(1) + 'px,' + q.top.toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3)); if (ems[j] === nmM) gl.classList.toggle('fo', nmBtn.matches(':focus-visible'));
+        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + q.left.toFixed(1) + 'px,' + q.top.toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3));
         if (lv > .35 && tt > nextMote && q.width > 6 && Math.random() < .35) { nextMote = tt + 1.4 + Math.random() * 2.6; var m = el('i', 'mote'); m.style.cssText = 'left:' + (mx + (Math.random() * 8 - 4)).toFixed(0) + 'px;top:' + (q.top + q.height * .3).toFixed(0) + 'px;--hue:' + gl.style.getPropertyValue('--hue'); f.appendChild(m); setTimeout(function (n) { return function () { if (n.parentNode) n.parentNode.removeChild(n) } }(m), 5200) }
       }
       raf = requestAnimationFrame(loop)
@@ -225,7 +225,6 @@
     /* crickets (only when sound is on, and they hush while it rains) */
     cr = setInterval(function () { if (rainEnd || !snd.on) return; var n = 3 + ((Math.random() * 3) | 0); for (var k = 0; k < n; k++)tone(4300, 4300, .05, .008, 'sine', k * .075) }, 2200);
     T.at(function () { speak(words(rainEnd ? 'rainy night. cozy.' : 'getting dark. good thing i packed a headlamp.'), 5200) }, 450);
-    if (first) T.at(function () { speak(words('that mushroom by the about section is glowing funny. poke it?'), 6000) }, 9500);
     nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); gone(f, 1800) }
   };
   /* the odd mushroom in the about section: inert until night has happened once (remembered), then the day/night toggle.

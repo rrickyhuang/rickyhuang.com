@@ -57,7 +57,6 @@ window.HIKER_LINES = {
 		"so many fireflies.",
 		"mind the roots.",
 		"dark, but not scary.",
-		"the stars are out.",
-		"one mushroom is glowing a different colour. just saying."
+		"the stars are out."
 	]
 };
