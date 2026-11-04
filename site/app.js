@@ -263,7 +263,7 @@
     })
   });
 
-  /* ---- rain: after 150s of visible time. gentle. ---- */
+  /* ---- rain: after 180s of visible time. gentle. ---- */
   var UMB = '<span class="ui"><svg viewBox="0 0 28 26" width="28" height="26" aria-hidden="true"><path d="M14 9.500V21c0 1.800-3 1.800-3 0" stroke="var(--ink)" stroke-width="1.400" fill="none" stroke-linecap="round"/><path d="M1 9.500C3 3.500 8 .8 14 .8S25 3.500 27 9.500q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0z" fill="var(--acc)"/><path d="M14 .8V-.5" stroke="var(--ink)" stroke-width="1.200" stroke-linecap="round"/></svg></span>';
   eggs.rain = function () {
     if (rainEnd || reduce) return;
@@ -298,7 +298,7 @@
     rainEnd = function () { ending = 1; if (stopBed) stopBed(.5); setTimeout(finish, 300) }
   };
   (function () {
-    var ra = 150, m = location.hash.match(/rain=(\d+)/), vis = 0, again = function () { return m ? ra : 480 + Math.round(Math.random() * 120) }; if (m) ra = +m[1];
+    var ra = 180, m = location.hash.match(/rain=(\d+)/), vis = 0, again = function () { return m ? ra : 480 + Math.round(Math.random() * 120) }; if (m) ra = +m[1];
     /* first shower at ra seconds of visible time, then again every ~8-10 min of visible time (measured from when the last one starts) */
     setInterval(function () { if (document.visibilityState === 'visible') vis++; if (vis >= ra) { if (rainEnd) { vis = ra - 5; return } vis = 0; ra = again(); startEgg('rain') } }, 1000)
   })();
