@@ -337,7 +337,7 @@
     setTimeout(function () { lb.classList.remove('open', 'closing'); lbOpen = false; arm(900); try { hit.focus({ preventScroll: true }) } catch (e) { } }, reduce ? 0 : 350)
   }
   hit.addEventListener('click', function (e) { e.stopPropagation(); show() });
-  document.addEventListener('click', function (e) { if (!hk.contains(e.target) && !(e.target.closest && e.target.closest('.nite'))) hide() });
+  document.addEventListener('click', function (e) { if (!hk.contains(e.target) && !(e.target.closest && e.target.closest('.nite, .bough'))) hide() }); /* the fern talks via the tickle handler, so don't close the bubble it just opened */
   addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (lbOpen) closeLB(); else hide() } });
   say.addEventListener('mouseenter', function () { if (!lbOpen) clearTimeout(hideT) });
   say.addEventListener('mouseleave', function () { if (hk.classList.contains('talk') && !lbOpen) arm(1400) });
