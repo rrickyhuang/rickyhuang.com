@@ -1,0 +1,39 @@
+# Copy to .github/workflows/deploy.yml in the site repo.
+# Repo settings: Pages -> Source: "GitHub Actions". Site files live in site/.
+# Every push AND once a day it refreshes site/film.json from Letterboxd, then publishes.
+# (Commits made by an Action's GITHUB_TOKEN do not trigger a Pages build, so film.json is
+#  generated at deploy time instead of being committed.)
+name: Deploy site
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh film.json from Letterboxd (keeps the committed copy if Letterboxd is down)
+        run: python tools/fetch_letterboxd.py --out site/film.json
+        continue-on-error: true
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

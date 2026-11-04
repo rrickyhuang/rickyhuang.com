@@ -1,0 +1,12 @@
+# Ask AI training crawlers not to use the site. Well-behaved bots honour this; it is a request, not a lock.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: *
+Allow: /
