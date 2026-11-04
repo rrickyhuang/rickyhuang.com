@@ -89,11 +89,18 @@
   /* ---- sound: all synthesized (no files), off by default, remembered ---- */
   var snd = { on: false, ctx: null, nb: null, live: [] };
   try { snd.on = localStorage.getItem('rh-snd') === '1' } catch (e) { }
-  function ac() { if (!snd.on) return null; if (!snd.ctx) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; try { snd.ctx = new C() } catch (e) { return null } } if (snd.ctx.state === 'suspended') snd.ctx.resume(); return snd.ctx }
+  function ac() { if (!snd.on) return null; if (!snd.ctx) { var C = window.AudioContext || window.webkitAudioContext; if (!C) return null; try { snd.ctx = new C() } catch (e) { return null } } if (document.hidden) ctxHold(snd.ctx); else ctxGo(snd.ctx); return snd.ctx }
   function tone(f0, f1, dur, vol, type, delay) {
-    var c = ac(); if (!c) return; var t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    var c = ac(); if (!c || document.hidden) return; var t = c.currentTime + (delay || 0), o = c.createOscillator(), g = c.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
     g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + .05)
   }
+  /* silence everything when the page is backgrounded (mobile tab switch / app switch), resume on return */
+  /* resume()/suspend() return promises that reject when the browser wants a user gesture (iOS), so swallow those. 'interrupted' is iOS's state after an app switch. */
+  function ctxGo(c) { try { if (c.state === 'suspended' || c.state === 'interrupted') { var p = c.resume(); if (p && p.catch) p.catch(function () { }) } } catch (e) { } }
+  function ctxHold(c) { try { if (c.state === 'running') { var p = c.suspend(); if (p && p.catch) p.catch(function () { }) } } catch (e) { } }
+  /* a context created or asked for while hidden (e.g. rain/fog bed started in a background tab) is held, then resumed here on return */
+  function sndHold(e) { var c = snd.ctx; if (!c) return; if (document.hidden || (e && e.type === 'pagehide')) ctxHold(c); else if (snd.on) ctxGo(c) }
+  document.addEventListener('visibilitychange', sndHold); addEventListener('pagehide', sndHold); addEventListener('pageshow', sndHold);
   function bed(type, freq, q, vol, fin) {
     var c = ac(); if (!c) return null;
     if (!snd.nb) { var n = c.sampleRate * 2, b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0); for (var i = 0; i < n; i++)d[i] = Math.random() * 2 - 1; snd.nb = b }
@@ -186,13 +193,13 @@
   eggs.night = function () {
     if (nightEnd) return;
     unlockNight();
-    var T = timers(), d = el('div', 'edark'), f = el('div', 'eff'), i, beam = el('i', 'ebeam'), lamp = el('i', 'elamp'), glows = [], alive = true, raf = 0, cr = null, lastG = performance.now() / 1000, nextMote = 0;
-    for (i = 0; i < 10; i++) { var ff = el('i', 'ff'); ff.style.cssText = 'left:' + (Math.random() * 96 + 2).toFixed(0) + '%;top:' + (Math.random() * 90 + 4).toFixed(0) + '%;--dx:' + ((Math.random() * 80 - 40) | 0) + 'px;--dy:' + ((Math.random() * 60 - 30) | 0) + 'px;--t:' + (5 + Math.random() * 5).toFixed(1) + 's;--w:' + (1.6 + Math.random() * 2.4).toFixed(1) + 's;animation-delay:' + (-Math.random() * 6).toFixed(1) + 's,' + (-Math.random() * 3).toFixed(1) + 's'; f.appendChild(ff) }
+    var T = timers(), d = el('div', 'edark'), f = el('div', 'eff'), g2 = el('div', 'eff efa'), layers = [f, g2], ffs = [], fw = 0, FH = 0, i, beam = el('i', 'ebeam'), lamp = el('i', 'elamp'), glows = [], alive = true, raf = 0, cr = null, lastG = performance.now() / 1000, nextMote = 0;
+    for (i = 0; i < 10; i++) { var ff = el('i', 'ff'); ff.style.cssText = 'left:' + (Math.random() * 96 + 2).toFixed(0) + '%;top:0;--dx:' + ((Math.random() * 80 - 40) | 0) + 'px;--dy:' + ((Math.random() * 60 - 30) | 0) + 'px;--t:' + (5 + Math.random() * 5).toFixed(1) + 's;--w:' + (1.6 + Math.random() * 2.4).toFixed(1) + 's;animation-delay:' + (-Math.random() * 6).toFixed(1) + 's,' + (-Math.random() * 3).toFixed(1) + 's'; ff.__b = Math.random(); ffs.push(ff); f.appendChild(ff) }
     f.appendChild(beam); f.appendChild(lamp);
     /* toggled back on while the last night is still fading out: take over from its current opacity (so no flash, and never two layers) */
-    var od = reclaim('.edark.out'), oe = reclaim('.eff.out'); document.body.appendChild(d); document.body.appendChild(f); nightEl = d; nmSync();
-    if (od) d.style.cssText += ';transition:none;opacity:' + od; if (oe) f.style.cssText += ';transition:none;opacity:' + oe;
-    void d.offsetWidth; d.style.transition = d.style.opacity = f.style.transition = f.style.opacity = ''; d.classList.add('in'); f.classList.add('in');
+    var od = reclaim('.edark.out'), oe = reclaim('.eff.out'); document.body.appendChild(d); layers.forEach(function (l) { document.body.appendChild(l) }); nightEl = d; nmSync();
+    if (od) d.style.cssText += ';transition:none;opacity:' + od; if (oe) layers.forEach(function (l) { l.style.cssText += ';transition:none;opacity:' + oe });
+    void d.offsetWidth; d.style.transition = d.style.opacity = ''; d.classList.add('in'); layers.forEach(function (l) { l.style.transition = l.style.opacity = ''; l.classList.add('in') });
     function loop() {
       if (!alive) return;
       var r = hk.getBoundingClientRect(), hx = r.left + r.width * .5, hy = r.top + r.height * .5, dd = parseFloat(hk.style.getPropertyValue('--dir')); if (!dd) dd = 1;
@@ -204,20 +211,26 @@
       /* mushrooms (trail egg + link bullets) glow in the dark. real foxfire: gills brightest, cap dim, stem dark; each one a little different. */
       var ems = [].slice.call(document.querySelectorAll('.emush:not(.out) .em,.links .m')), tt = performance.now() / 1000, dtg = Math.min(.1, tt - lastG); lastG = tt;
       if (nmM) ems.unshift(nmM); /* always index 0, so its glow slot never shifts when trail mushrooms come and go */
-      var fe = document.querySelector('.efog:not(.out)'), fg = fe ? (parseFloat(getComputedStyle(fe).opacity) || 0) : 0; f.style.setProperty('--fg', fg.toFixed(3));
+      var fe = document.querySelector('.efog:not(.out)'), fg = fe ? (parseFloat(getComputedStyle(fe).opacity) || 0) : 0;
+      /* read every rect first, then write: interleaving them forces a layout per mushroom per frame */
+      var rects = ems.map(function (e) { return e.getBoundingClientRect() }), sx = scrollX, sy = scrollY;
+      /* fireflies drift with the page (wrapping around the viewport) instead of being pinned to the screen. __b is a 0-1 fraction of the wrap height.
+         FH only follows width changes: mobile toolbars resize the height while scrolling, which would make them jump. */
+      if (innerWidth !== fw) { fw = innerWidth; FH = innerHeight + 160 }
+      for (var fi = 0; fi < ffs.length; fi++) ffs[fi].style.transform = 'translateY(' + (((ffs[fi].__b * FH - sy * .9) % FH + FH) % FH - 80).toFixed(1) + 'px)';
       while (glows.length < ems.length) {
         var sp = ems[glows.length] === nmM, g = el('i', 'eg' + (sp ? ' sp' : ''), GLOWSVG + '<b class="h2"></b><b class="h1"></b><b class="gr"></b>'), hue = sp ? SPHUE : 140 + Math.random() * 36;
-        g.style.setProperty('--hue', hue.toFixed(0)); if (!sp && ems[glows.length].closest && ems[glows.length].closest('.links')) g.className += ' bl'; g.__p = { b: sp ? .95 : .5 + Math.random() * .5, per: 3 + Math.random() * 4.5, ph: Math.random() * 6.28, fl: 0, nf: tt + 3 + Math.random() * 10 }; f.appendChild(g); glows.push(g)
+        g.style.setProperty('--hue', hue.toFixed(0)); if (!sp && ems[glows.length].closest && ems[glows.length].closest('.links')) g.className += ' bl'; g.__p = { b: sp ? .95 : .5 + Math.random() * .5, per: 3 + Math.random() * 4.5, ph: Math.random() * 6.28, fl: 0, nf: tt + 3 + Math.random() * 10 }; g2.appendChild(g); glows.push(g)
       }
-      while (glows.length > ems.length) { f.removeChild(glows.pop()) }
+      while (glows.length > ems.length) { g2.removeChild(glows.pop()) }
       for (var j = 0; j < ems.length; j++) {
-        var q = ems[j].getBoundingClientRect(), mx = q.left + q.width / 2, my = q.top + q.height / 2, gl = glows[j], p = gl.__p,
+        var q = rects[j], mx = q.left + q.width / 2, my = q.top + q.height / 2, gl = glows[j], p = gl.__p,
           D = dk(Math.hypot(mx - px, my - py), 2.6, 6.5, 11.5) * dk(Math.hypot(mx - hx, my - hy), 7, 10.5, 15), lv = Math.max(0, (D - .35) / .65); lv = lv * lv * (1 - .55 * fg);
         if (tt > p.nf) { p.fl = 1; p.nf = tt + 5 + Math.random() * 12 } p.fl = Math.max(0, p.fl - dtg * 2.2);
         var s = Math.sin(tt / p.per * 6.283 + p.ph), pu = .74 + .26 * (s * s * (s < 0 ? .6 : 1) + .2), sz = Math.min(1.25, Math.max(.6, q.width / 16)),
           b = Math.min(1, p.b * sz * pu * (1 - .5 * p.fl)), gs = gl.style;
-        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + q.left.toFixed(1) + 'px,' + q.top.toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3));
-        if (lv > .35 && tt > nextMote && q.width > 6 && Math.random() < .35) { nextMote = tt + 1.4 + Math.random() * 2.6; var m = el('i', 'mote'); m.style.cssText = 'left:' + (mx + (Math.random() * 8 - 4)).toFixed(0) + 'px;top:' + (q.top + q.height * .3).toFixed(0) + 'px;--hue:' + gl.style.getPropertyValue('--hue'); f.appendChild(m); setTimeout(function (n) { return function () { if (n.parentNode) n.parentNode.removeChild(n) } }(m), 5200) }
+        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + (q.left + sx).toFixed(1) + 'px,' + (q.top + sy).toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3));
+        if (lv > .35 && tt > nextMote && q.width > 6 && Math.random() < .35) { nextMote = tt + 1.4 + Math.random() * 2.6; var m = el('i', 'mote'); m.style.cssText = 'left:' + (mx + sx + (Math.random() * 8 - 4)).toFixed(0) + 'px;top:' + (q.top + sy + q.height * .3).toFixed(0) + 'px;--hue:' + gl.style.getPropertyValue('--hue'); g2.appendChild(m); setTimeout(function (n) { return function () { if (n.parentNode) n.parentNode.removeChild(n) } }(m), 5200) }
       }
       raf = requestAnimationFrame(loop)
     }
@@ -225,7 +238,7 @@
     /* crickets (only when sound is on, and they hush while it rains) */
     cr = setInterval(function () { if (rainEnd || !snd.on) return; var n = 3 + ((Math.random() * 3) | 0); for (var k = 0; k < n; k++)tone(4300, 4300, .05, .008, 'sine', k * .075) }, 2200);
     T.at(function () { speak(words(rainEnd ? 'rainy night. cozy.' : 'getting dark. good thing i packed a headlamp.'), 5200) }, 450);
-    nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); gone(f, 1800) }
+    nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); layers.forEach(function (l) { gone(l, 1800) }) }
   };
   /* the odd mushroom in the about section: inert until night has happened once (remembered), then the day/night toggle.
      it glows violet, the others green. */
