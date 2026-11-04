@@ -3,6 +3,7 @@
 Personal landing page. Plain static files in `site/`, published with GitHub Pages.
 
     site/index.html       the page (styles.css, app.js, assets/)
+    site/lines.js         what the hiker says (edit the lists freely)
     site/404.html         "lost in the fog" page, served automatically for any missing URL
     site/film.json        latest Letterboxd logs, refreshed daily by the workflow
     site/og-image.jpg     link-preview image (1200x630)

@@ -948,6 +948,67 @@ li:hover .horn path:nth-child(3) {
 	font-size: .98rem
 }
 
+/* the odd mushroom in the about section. inert decoration until night has happened once, then the day/night toggle.
+   44px hit area perched just right of the ABOUT label, so it never overlaps the bio text. */
+.nite {
+	position: absolute;
+	top: -25px;
+	left: calc(var(--u) + 2.4rem);
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	color: var(--acc);
+	background: none;
+	border: 0;
+	border-radius: 50%;
+	cursor: default;
+	-webkit-tap-highlight-color: transparent
+}
+
+.nite .m {
+	width: 1.3rem;
+	height: 1.3rem
+}
+
+.nite:not(:disabled) {
+	cursor: pointer
+}
+
+.nite:not(:disabled) .m {
+	--spot: hsl(268 70% 90%)
+}
+
+.nite:not(:disabled):hover .m {
+	transform: scale(1.22) rotate(-10deg)
+}
+
+.nite:focus-visible {
+	outline: 2px solid var(--acc);
+	outline-offset: -5px
+}
+
+.nite.wake .m {
+	animation: nwake .9s cubic-bezier(.3, 1.5, .5, 1)
+}
+
+@keyframes nwake {
+	0% {
+		scale: 1
+	}
+
+	35% {
+		scale: 1.45;
+		rotate: -12deg
+	}
+
+	100% {
+		scale: 1;
+		rotate: 0deg
+	}
+}
+
 .bough-m {
 	display: none
 }
@@ -1511,8 +1572,31 @@ li:hover .horn path:nth-child(3) {
 	opacity: .2
 }
 
-.eff .eg.bl .gr {
+.eff .eg.bl .gr,
+.eff .eg.sp .gr {
 	display: none
+}
+
+/* the special mushroom: same recipe as the others, violet instead of green, a touch softer so it reads as "odd" rather than loud */
+.eff .eg.sp .cp {
+	fill: hsl(var(--hue) 52% 46%)
+}
+
+.eff .eg.sp .gl {
+	stroke: hsl(var(--hue) 72% 77%)
+}
+
+.eff .eg.sp .h1 {
+	background: radial-gradient(closest-side, hsl(var(--hue) 72% 62% / .4), hsl(var(--hue) 72% 56% / .12) 58%, transparent)
+}
+
+/* keyboard focus on the special mushroom, drawn above the dark layer so it can be found at night */
+.eff .eg.fo::after {
+	content: "";
+	position: absolute;
+	inset: -12px;
+	border: 2px solid hsl(var(--hue) 85% 78%);
+	border-radius: 50%
 }
 
 .eff .eg .gl {

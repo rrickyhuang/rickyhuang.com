@@ -1,0 +1,63 @@
+/* what the hiker says. edit freely: lowercase, no apostrophes, one line per entry (mind the commas).
+   loaded before app.js; the file is optional-safe: app.js falls back to a single line if it is missing. */
+window.HIKER_LINES = {
+	/* tap-the-hiker lines, shuffled so none repeats until all have been used */
+	pool: [
+		"fogs lifting. good day for a walk.",
+		"take the long way round.",
+		"look up.",
+		"take a seat.",
+		"rain again?",
+		"pace yourself.",
+		"psst. the fern is ticklish.",
+		"hey, that tickles.",
+		"take a picture, itll last longer!",
+		"snack break? i always pack too many.",
+		"slow down.",
+		"its not an adventure if you know where youre going.",
+		"so much life.",
+		"whats around the corner?",
+		"look how far youve come!",
+		"one step at a time.",
+		"what a beautiful day!",
+		"wait a moment.",
+		"look around.",
+		"somethings on the horizon.",
+		"watch your step!",
+		"stay hydrated.",
+		"make good choices.",
+		"i see you!",
+		"im hungry.",
+		"try the scenic route.",
+		"look in the distance.",
+		"why dont we explore?",
+		"lets go on an adventure!",
+		"remember to make time for fun!",
+		"enjoy the journey.",
+		"try something new today!",
+		"be kind.",
+		"enjoy the quiet.",
+		"i wish i was a bird.",
+		"things are looking up.",
+		"change is good.",
+		"lets move a mountain.",
+		"it doesnt get better than this!",
+		"are you scared?",
+		"youre so brave!",
+		"being ready is a decision, not a feeling.",
+		"take a leap of faith.",
+		"you can trust me.",
+		"love yourself.",
+		"change is messy.",
+		"help each other.",
+		"life happens wherever you are, whether you make it or not."
+	],
+	/* same, but only while it is night */
+	night: [
+		"so many fireflies.",
+		"mind the roots.",
+		"dark, but not scary.",
+		"the stars are out.",
+		"one mushroom is glowing a different colour. just saying."
+	]
+};

@@ -10,7 +10,7 @@
   /* ---- words. edit freely. lowercase, no apostrophes. ---- */
   var GREET = "hi, im ricky. thanks for stopping by.";
   var MAIL = 'say hi: <a href="mailto:rky@rickyhuang.com">rky@rickyhuang.com</a>';
-  var POOL = ["fogs lifting. good day for a walk.", "take the long way round.", "look up.", "take a seat.", "rain again?", "pace yourself.", "psst. the fern is ticklish.", "hey, that tickles.", "take a picture, itll last longer!", "snack break? i always pack too many.", "slow down.", "its not an adventure if you know where youre going.", "so much life.", "whats around the corner?", "look how far youve come!", "one step at a time.", "what a beautiful day!", "wait a moment.", "look around.", "somethings on the horizon.", "watch your step!", "stay hydrated.", "make good choices.", "i see you!", "im hungry.", "try the scenic route.", "look in the distance.", "why dont we explore?", "lets go on an adventure!", "remember to make time for fun!", "enjoy the journey.", "try something new today!", "be kind.", "enjoy the quiet.", "i wish i was a bird.", "things are looking up.", "change is good.", "lets move a mountain.", "it doesnt get better than this!", "are you scared?", "youre so brave!", "being ready is a decision, not a feeling.", "take a leap of faith.", "you can trust me.", "love yourself.", "change is messy.", "help each other.", "life happens wherever you are, whether you make it or not."];
+  var POOL = (window.HIKER_LINES && window.HIKER_LINES.pool) || ["take the long way round."], NIGHT = (window.HIKER_LINES && window.HIKER_LINES.night) || POOL; /* the lines live in lines.js */
   var PLINES = ["look at this picture i took!", "check out this pic!", "isnt this beautiful?", "look at this shot!", "this is what my camera sees.", "beautiful, eh?", "check it out!", "wanna see a pic i took?", "look at this!", "heres a photo i took!", "i wish i was here again."];
   /* ---- photos. placeholders for now: swap src/title/meta for real ones. ---- */
   var PHOTOS = [];
@@ -25,9 +25,10 @@
     return '<div class="fm">' + words(lead) + ' <a target="_blank" rel="noopener" href="' + esc(f.url) + '">' + esc(f.title) + '</a><small>' + meta + '</small></div>'
   }
   var capQ = [], lastCap = '';
-  var VARS = ['pop', 'bump', 'wiggle', 'drop', 'swing'], lastVar = '', tapN = 0, textQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
+  var VARS = ['pop', 'bump', 'wiggle', 'drop', 'swing'], lastVar = '', tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t } return a }
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
+  function nextNight() { if (!nightQ.length) nightQ = shuffle(NIGHT.slice()); return nightQ.pop() }
   function nextCap() { if (!capQ.length) { capQ = shuffle(PLINES.slice()); if (capQ[capQ.length - 1] === lastCap) { var f = capQ[0]; capQ[0] = capQ[capQ.length - 1]; capQ[capQ.length - 1] = f } } lastCap = capQ.pop(); return lastCap }
   function nextPhoto() { if (!photoQ.length) photoQ = shuffle(PHOTOS.slice()); return photoQ.pop() }
   function pickVar() { var q; do { q = VARS[Math.floor(Math.random() * VARS.length)] } while (q === lastVar); lastVar = q; return q }
@@ -40,7 +41,6 @@
   function arm(ms) { clearTimeout(hideT); hideT = setTimeout(hide, ms) }
   function show() {
     tapN++;
-    if (typeof nightEnd !== 'undefined' && nightEnd) { tapN--; endNight(); speak(words('i love a good sunrise.'), 2600); return }
     if (typeof egg === 'function' && tapN % 15 === 0) { egg(); return }
     var html, ph = null, ms;
     if (tapN === 1) { html = words(GREET); ms = 4600 }
@@ -50,7 +50,7 @@
       ph = nextPhoto();
       html = '<div class="pm"><button class="thumb" type="button" aria-label="open photo"><img alt="" src="' + ph.src + '"></button><span>' + nextCap() + '<small>tap to open</small></span></div>'; ms = 7500
     }
-    else { var t = nextText(); html = words(t); ms = Math.max(3400, 2400 + t.length * 50) }
+    else { var t = nightEl ? nextNight() : nextText(); html = words(t); ms = Math.max(3400, 2400 + t.length * 50) }
     speak(html, ms, ph)
   }
   function speak(html, ms, ph) {
@@ -182,12 +182,17 @@
     if (tickles >= 3) { tickles = 0; startEgg('fog') } else tickleT = setTimeout(function () { tickles = 0 }, 4000)
   });
 
-  /* ---- night: click every web link once; stays dark until you tap the hiker ---- */
+  /* ---- night: click every web link once; stays dark until the odd mushroom in the about section is tapped (below) ---- */
   eggs.night = function () {
     if (nightEnd) return;
+    var first = !nmOn; unlockNight();
     var T = timers(), d = el('div', 'edark'), f = el('div', 'eff'), i, beam = el('i', 'ebeam'), lamp = el('i', 'elamp'), glows = [], alive = true, raf = 0, cr = null, lastG = performance.now() / 1000, nextMote = 0;
     for (i = 0; i < 10; i++) { var ff = el('i', 'ff'); ff.style.cssText = 'left:' + (Math.random() * 96 + 2).toFixed(0) + '%;top:' + (Math.random() * 90 + 4).toFixed(0) + '%;--dx:' + ((Math.random() * 80 - 40) | 0) + 'px;--dy:' + ((Math.random() * 60 - 30) | 0) + 'px;--t:' + (5 + Math.random() * 5).toFixed(1) + 's;--w:' + (1.6 + Math.random() * 2.4).toFixed(1) + 's;animation-delay:' + (-Math.random() * 6).toFixed(1) + 's,' + (-Math.random() * 3).toFixed(1) + 's'; f.appendChild(ff) }
-    f.appendChild(beam); f.appendChild(lamp); document.body.appendChild(d); document.body.appendChild(f); nightEl = d; void d.offsetWidth; d.classList.add('in'); f.classList.add('in');
+    f.appendChild(beam); f.appendChild(lamp);
+    /* toggled back on while the last night is still fading out: take over from its current opacity (so no flash, and never two layers) */
+    var od = reclaim('.edark.out'), oe = reclaim('.eff.out'); document.body.appendChild(d); document.body.appendChild(f); nightEl = d; nmSync();
+    if (od) d.style.cssText += ';transition:none;opacity:' + od; if (oe) f.style.cssText += ';transition:none;opacity:' + oe;
+    void d.offsetWidth; d.style.transition = d.style.opacity = f.style.transition = f.style.opacity = ''; d.classList.add('in'); f.classList.add('in');
     function loop() {
       if (!alive) return;
       var r = hk.getBoundingClientRect(), hx = r.left + r.width * .5, hy = r.top + r.height * .5, dd = parseFloat(hk.style.getPropertyValue('--dir')); if (!dd) dd = 1;
@@ -197,11 +202,12 @@
       beam.style.transform = 'translate(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px) scaleX(' + dd.toFixed(2) + ')';
       lamp.style.transform = 'translate(' + (lx - 2).toFixed(1) + 'px,' + (ly - 2).toFixed(1) + 'px)';
       /* mushrooms (trail egg + link bullets) glow in the dark. real foxfire: gills brightest, cap dim, stem dark; each one a little different. */
-      var ems = document.querySelectorAll('.emush:not(.out) .em,.links .m'), tt = performance.now() / 1000, dtg = Math.min(.1, tt - lastG); lastG = tt;
+      var ems = [].slice.call(document.querySelectorAll('.emush:not(.out) .em,.links .m')), tt = performance.now() / 1000, dtg = Math.min(.1, tt - lastG); lastG = tt;
+      if (nmM) ems.unshift(nmM); /* always index 0, so its glow slot never shifts when trail mushrooms come and go */
       var fe = document.querySelector('.efog:not(.out)'), fg = fe ? (parseFloat(getComputedStyle(fe).opacity) || 0) : 0; f.style.setProperty('--fg', fg.toFixed(3));
       while (glows.length < ems.length) {
-        var g = el('i', 'eg', GLOWSVG + '<b class="h2"></b><b class="h1"></b><b class="gr"></b>'), hue = 140 + Math.random() * 36;
-        g.style.setProperty('--hue', hue.toFixed(0)); if (ems[glows.length].closest && ems[glows.length].closest('.links')) g.className += ' bl'; g.__p = { b: .5 + Math.random() * .5, per: 3 + Math.random() * 4.5, ph: Math.random() * 6.28, fl: 0, nf: tt + 3 + Math.random() * 10 }; f.appendChild(g); glows.push(g)
+        var sp = ems[glows.length] === nmM, g = el('i', 'eg' + (sp ? ' sp' : ''), GLOWSVG + '<b class="h2"></b><b class="h1"></b><b class="gr"></b>'), hue = sp ? SPHUE : 140 + Math.random() * 36;
+        g.style.setProperty('--hue', hue.toFixed(0)); if (!sp && ems[glows.length].closest && ems[glows.length].closest('.links')) g.className += ' bl'; g.__p = { b: sp ? .95 : .5 + Math.random() * .5, per: 3 + Math.random() * 4.5, ph: Math.random() * 6.28, fl: 0, nf: tt + 3 + Math.random() * 10 }; f.appendChild(g); glows.push(g)
       }
       while (glows.length > ems.length) { f.removeChild(glows.pop()) }
       for (var j = 0; j < ems.length; j++) {
@@ -210,7 +216,7 @@
         if (tt > p.nf) { p.fl = 1; p.nf = tt + 5 + Math.random() * 12 } p.fl = Math.max(0, p.fl - dtg * 2.2);
         var s = Math.sin(tt / p.per * 6.283 + p.ph), pu = .74 + .26 * (s * s * (s < 0 ? .6 : 1) + .2), sz = Math.min(1.25, Math.max(.6, q.width / 16)),
           b = Math.min(1, p.b * sz * pu * (1 - .5 * p.fl)), gs = gl.style;
-        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + q.left.toFixed(1) + 'px,' + q.top.toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3));
+        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + q.left.toFixed(1) + 'px,' + q.top.toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3)); if (ems[j] === nmM) gl.classList.toggle('fo', nmBtn.matches(':focus-visible'));
         if (lv > .35 && tt > nextMote && q.width > 6 && Math.random() < .35) { nextMote = tt + 1.4 + Math.random() * 2.6; var m = el('i', 'mote'); m.style.cssText = 'left:' + (mx + (Math.random() * 8 - 4)).toFixed(0) + 'px;top:' + (q.top + q.height * .3).toFixed(0) + 'px;--hue:' + gl.style.getPropertyValue('--hue'); f.appendChild(m); setTimeout(function (n) { return function () { if (n.parentNode) n.parentNode.removeChild(n) } }(m), 5200) }
       }
       raf = requestAnimationFrame(loop)
@@ -219,9 +225,21 @@
     /* crickets (only when sound is on, and they hush while it rains) */
     cr = setInterval(function () { if (rainEnd || !snd.on) return; var n = 3 + ((Math.random() * 3) | 0); for (var k = 0; k < n; k++)tone(4300, 4300, .05, .008, 'sine', k * .075) }, 2200);
     T.at(function () { speak(words(rainEnd ? 'rainy night. cozy.' : 'getting dark. good thing i packed a headlamp.'), 5200) }, 450);
-    T.at(function () { speak(words('tap me to turn the lights back on.'), 6000) }, 9500);
-    nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; sfx.lights(); gone(d, 1800); gone(f, 1800) }
+    if (first) T.at(function () { speak(words('that mushroom by the about section is glowing funny. poke it?'), 6000) }, 9500);
+    nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); gone(f, 1800) }
   };
+  /* the odd mushroom in the about section: inert until night has happened once (remembered), then the day/night toggle.
+     it glows violet, the others green. */
+  var NKEY = 'rh-night', SPHUE = 268, nmBtn = document.querySelector('.nite'), nmM = nmBtn && nmBtn.querySelector('.m'), nmOn = false;
+  try { nmOn = localStorage.getItem(NKEY) === '1' } catch (e) { }
+  function nmSync() { if (!nmBtn) return; nmBtn.disabled = !nmOn; if (nmOn) nmBtn.removeAttribute('aria-hidden'); else nmBtn.setAttribute('aria-hidden', 'true'); nmBtn.setAttribute('aria-pressed', nightEl ? 'true' : 'false') }
+  function unlockNight() { if (nmOn) return; nmOn = true; try { localStorage.setItem(NKEY, '1') } catch (e) { } nmSync(); if (nmBtn) { nmBtn.classList.add('wake'); setTimeout(function () { nmBtn.classList.remove('wake') }, 1000) } }
+  function reclaim(sel) { var o = 0; [].forEach.call(document.querySelectorAll(sel), function (n) { o = Math.max(o, parseFloat(getComputedStyle(n).opacity) || 0); if (n.parentNode) n.parentNode.removeChild(n) }); return o }
+  nmSync();
+  if (nmBtn) nmBtn.addEventListener('click', function () {
+    if (!nmOn) return;
+    if (nightEnd) { endNight(); speak(words('i love a good sunrise.'), 2600) } else startEgg('night')
+  });
   /* every web link once (the email link doesn't count) */
   var LKEY = 'rh-links', links = [].slice.call(document.querySelectorAll('.links a')).filter(function (a) { return !/^mailto:/.test(a.getAttribute('href')) });
   function seen() { try { return JSON.parse(localStorage.getItem(LKEY) || '[]') } catch (e) { return [] } }
@@ -307,7 +325,7 @@
     setTimeout(function () { lb.classList.remove('open', 'closing'); lbOpen = false; arm(900); try { hit.focus({ preventScroll: true }) } catch (e) { } }, reduce ? 0 : 350)
   }
   hit.addEventListener('click', function (e) { e.stopPropagation(); show() });
-  document.addEventListener('click', function (e) { if (!hk.contains(e.target)) hide() });
+  document.addEventListener('click', function (e) { if (!hk.contains(e.target) && !(e.target.closest && e.target.closest('.nite'))) hide() });
   addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (lbOpen) closeLB(); else hide() } });
   say.addEventListener('mouseenter', function () { if (!lbOpen) clearTimeout(hideT) });
   say.addEventListener('mouseleave', function () { if (hk.classList.contains('talk') && !lbOpen) arm(1400) });
