@@ -7,13 +7,13 @@ window.HIKER_LINES = {
 		"take the long way round.",
 		"look up.",
 		"take a seat.",
-		"rain again?",
+		"is it raining?",
 		"pace yourself.",
 		"psst. the fern is ticklish.",
 		"hey, that tickles.",
 		"take a picture, itll last longer!",
 		"snack break? i always pack too many.",
-		"slow down.",
+		"slow down. enjoy yourself.",
 		"its not an adventure if you know where youre going.",
 		"so much life.",
 		"whats around the corner?",
@@ -50,13 +50,27 @@ window.HIKER_LINES = {
 		"love yourself.",
 		"change is messy.",
 		"help each other.",
-		"life happens wherever you are, whether you make it or not."
+		"life happens wherever you are, whether you make it or not.",
+		"hows it going?",
+		"i like when its quiet.",
+		"you seem familiar."
 	],
 	/* same, but only while it is night */
 	night: [
 		"so many fireflies.",
-		"mind the roots.",
-		"dark, but not scary.",
-		"the stars are out."
+		"mind your step.",
+		"are you scared of the dark?",
+		"the stars are out.",
+		"i love the stars",
+		"its so peaceful.",
+		"the night is full of mysteries.",
+		"the crickets remind me of home.",
+		"do you get homesick?",
+		"im sleepy...",
+		"the moon is beautiful tonight.",
+		"its chilly tonight.",
+		"i come alive at night!",
+		"have you ever seen the northern lights?",
+		"the wolves are howling."
 	]
 };

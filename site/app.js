@@ -212,7 +212,7 @@
       while (glows.length > ems.length) { f.removeChild(glows.pop()) }
       for (var j = 0; j < ems.length; j++) {
         var q = ems[j].getBoundingClientRect(), mx = q.left + q.width / 2, my = q.top + q.height / 2, gl = glows[j], p = gl.__p,
-        D = dk(Math.hypot(mx - px, my - py), 2.6, 6.5, 11.5) * dk(Math.hypot(mx - hx, my - hy), 7, 10.5, 15), lv = Math.max(0, (D - .35) / .65); lv = lv * lv * (1 - .55 * fg);
+          D = dk(Math.hypot(mx - px, my - py), 2.6, 6.5, 11.5) * dk(Math.hypot(mx - hx, my - hy), 7, 10.5, 15), lv = Math.max(0, (D - .35) / .65); lv = lv * lv * (1 - .55 * fg);
         if (tt > p.nf) { p.fl = 1; p.nf = tt + 5 + Math.random() * 12 } p.fl = Math.max(0, p.fl - dtg * 2.2);
         var s = Math.sin(tt / p.per * 6.283 + p.ph), pu = .74 + .26 * (s * s * (s < 0 ? .6 : 1) + .2), sz = Math.min(1.25, Math.max(.6, q.width / 16)),
           b = Math.min(1, p.b * sz * pu * (1 - .5 * p.fl)), gs = gl.style;
@@ -233,7 +233,7 @@
   try { nmOn = localStorage.getItem(NKEY) === '1' } catch (e) { }
   function nmSync() { if (!nmBtn) return; nmBtn.disabled = !nmOn; if (nmOn) nmBtn.removeAttribute('aria-hidden'); else nmBtn.setAttribute('aria-hidden', 'true'); nmBtn.setAttribute('aria-pressed', nightEl ? 'true' : 'false') }
   function unlockNight() { if (nmOn) return; nmOn = true; try { localStorage.setItem(NKEY, '1') } catch (e) { } nmSync(); if (nmBtn) { nmBtn.classList.add('wake'); setTimeout(function () { nmBtn.classList.remove('wake') }, 1000) } }
-  function reclaim(sel) { var o = 0; [].forEach.call(document.querySelectorAll(sel), function (n) { o = Math.max(o, parseFloat(getComputedStyle(n).opacity) || 0); if (n.parentNode) n.parentNode.removeChild(n) }); return o }
+  function reclaim(sel) { var o = 0;[].forEach.call(document.querySelectorAll(sel), function (n) { o = Math.max(o, parseFloat(getComputedStyle(n).opacity) || 0); if (n.parentNode) n.parentNode.removeChild(n) }); return o }
   nmSync();
   if (nmBtn) nmBtn.addEventListener('click', function () {
     if (!nmOn) return;
