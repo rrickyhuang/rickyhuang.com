@@ -953,7 +953,7 @@ li:hover .horn path:nth-child(3) {
 .nite {
 	position: absolute;
 	top: -25px;
-	left: calc(var(--u) + 2.4rem);
+	left: calc(var(--u) + 2.85rem);
 	display: grid;
 	place-items: center;
 	width: 44px;
@@ -1594,7 +1594,7 @@ li:hover .horn path:nth-child(3) {
 .eff .eg.fo::after {
 	content: "";
 	position: absolute;
-	inset: -12px;
+	inset: -5px;
 	border: 2px solid hsl(var(--hue) 85% 78%);
 	border-radius: 50%
 }
