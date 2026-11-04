@@ -8,7 +8,7 @@
   var x = 0, v = 0, dir = 1, dirS = 1, phase = 0, tx = 0, wait = 0, pause = 2.5, mouseX = null, lastMove = -1e9, since = 0, walking = false, frozen = false, hideT = null, prev = performance.now();
   var VMAX_CHASE = 190, VMAX_STROLL = 34, ACC = 220, DEC = 420, K = 1.8, DEAD = 30, REACT = 180;
   /* ---- words. edit freely. lowercase, no apostrophes. ---- */
-  var GREET = "hi, im ricky. thanks for stopping by.";
+  var GREET = "hi, thanks for stopping by. stay a while :)";
   var MAIL = 'say hi: <a href="mailto:rky@rickyhuang.com">rky@rickyhuang.com</a>';
   var POOL = (window.HIKER_LINES && window.HIKER_LINES.pool) || ["take the long way round."], NIGHT = (window.HIKER_LINES && window.HIKER_LINES.night) || POOL; /* the lines live in lines.js */
   var PLINES = ["look at this picture i took!", "check out this pic!", "isnt this beautiful?", "look at this shot!", "this is what my camera sees.", "beautiful, eh?", "check it out!", "wanna see a pic i took?", "look at this!", "heres a photo i took!", "i wish i was here again."];
