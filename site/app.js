@@ -178,15 +178,15 @@
     T.at(function () { fogEnd() }, 9800);
     fogEnd = function () { T.clear(); fogEnd = null; if (stop) stop(.6); gone(f, 1200) }
   };
-  var tickles = 0, tickleT = null;
+  var tickles = 0, tickleT = null, TICKLES = 10; /* fern clicks needed for fog */
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.bough'); if (!b) return;
     tickles++; clearTimeout(tickleT);
     var a = 1 + .4 * (Math.min(tickles, 3) - 1);
     if (b.animate) b.animate([{ transform: 'rotate(2deg)' }, { transform: 'rotate(' + (2 - 9 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 8 * a) + 'deg)' }, { transform: 'rotate(' + (2 - 5 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 3 * a) + 'deg)' }, { transform: 'rotate(2deg)' }], { duration: 900, easing: 'ease-out' });
-    tone(900 + tickles * 140, null, .1, .03, 'triangle');
+    tone(900 + Math.min(tickles, 10) * 70, null, .1, .03, 'triangle');
     if (tickles === 1 && !fogEnd) speak(words('hey, that tickles.'), 2400);
-    if (tickles >= 3) { tickles = 0; startEgg('fog') } else tickleT = setTimeout(function () { tickles = 0 }, 4000)
+    if (tickles >= TICKLES) { tickles = 0; startEgg('fog') } else tickleT = setTimeout(function () { tickles = 0 }, 4000)
   });
 
   /* ---- night: click every web link once; stays dark until the odd mushroom in the about section is tapped (below) ---- */
