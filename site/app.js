@@ -230,8 +230,22 @@
       TL.n++; var c = TL.n + '/4'; TL.root.querySelector('.tl-cnt').textContent = c; TL.pill.querySelector('.tl-pc').textContent = c;
       TL.pill.setAttribute('aria-label', 'trail log, ' + TL.n + ' of 4 stamps'); TL.root.querySelector('.tl-sr').textContent = 'stamp collected: ' + s.name + '. ' + TL.n + ' of 4.';
       if (toPill || !TL.open) retrig(TL.pill, 'bump'); else retrig(st, 'settle');
-      if (first && !TL.touched) TL.timer = setTimeout(function () { if (!TL.touched) setOpen(false) }, 3000) /* folds itself away after a moment unless you've touched it */
+      if (TL.n === 4) setTimeout(logFull, 500);
+      else if (first && !TL.touched) TL.timer = setTimeout(function () { if (!TL.touched) setOpen(false) }, 3000) /* folds itself away after a moment unless you've touched it */
     })
+  }
+  /* all four found: the card opens (even if it was closed) and is rubber-stamped, the pill goes rust, he hops and the trail blooms. once. */
+  function logFull() {
+    if (TL.full) return; TL.full = 1; TL.touched = true; clearTimeout(TL.timer); setOpen(true);
+    TL.root.classList.add('full'); TL.root.querySelector('.tl-ttl').textContent = 'log full';
+    TL.root.querySelector('.tl-grid').appendChild(el('span', 'tl-over', 'all stamped'));
+    TL.root.querySelector('.tl-sr').textContent = 'all four stamps collected. trail log full.';
+    sfx.pip(); hk.classList.remove('hop'); void hk.offsetWidth; hk.classList.add('hop');
+    speak(words('you found everything. im impressed.'), 5200);
+    var hr = host.getBoundingClientRect(), spans = [].map.call(host.querySelectorAll('.lab>span'), function (s) { return s.getBoundingClientRect() }), mc = el('span', 'emush'),
+      ctx = { mc: mc, fx: x + W / 2, hr: hr, spans: spans, n: 0 }, N = Math.max(6, Math.floor(host.clientWidth / 34)), k = 0;
+    host.appendChild(mc);
+    for (var i = 0; i < N; i++) { var px = freeSpot(ctx); if (px < 0) continue; sprout(ctx, px, k * 70, k); sfx.bloop(k); k++ }
   }
   function sprout(ctx, px, delay, k) { var s = 9 + Math.random() * 9, m = el('span', '', shroom()).firstChild; m.style.cssText = 'left:' + px.toFixed(0) + 'px;--s:' + s.toFixed(1) + ';--d:' + delay + 'ms;--k:' + k; ctx.mc.appendChild(m); ctx.n++ }
   function freeSpot(ctx) { for (var i = 0; i < 12; i++) { var px = 10 + Math.random() * (host.clientWidth - 20), gx = px + ctx.hr.left, ok = Math.abs(px - ctx.fx) > 16; ctx.spans.forEach(function (r) { if (gx > r.left - 12 && gx < r.right + 12) ok = false }); if (ok) return px } return -1 }

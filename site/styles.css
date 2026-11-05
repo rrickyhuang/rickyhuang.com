@@ -1267,6 +1267,53 @@ body:has(.edark:not(.out)) .tlog {
 	opacity: .5
 }
 
+.tl-grid {
+	position: relative
+}
+
+/* all four: a rubber stamp across the card, and the pill turns rust */
+.tl-over {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	translate: -50% -50%;
+	rotate: -11deg;
+	padding: .05rem .5rem;
+	border: 3px double var(--acc);
+	color: var(--acc);
+	font: 400 .9rem 'Young Serif', Georgia, serif;
+	white-space: nowrap;
+	mix-blend-mode: multiply;
+	pointer-events: none;
+	animation: tlthump .5s cubic-bezier(.55, 0, .9, .45) both
+}
+
+.tlog.full .tl-pill {
+	background: var(--acc);
+	box-shadow: 2px 2px 0 var(--deep)
+}
+
+@keyframes tlthump {
+	0% {
+		opacity: 0;
+		scale: 2.2
+	}
+
+	62% {
+		opacity: .95;
+		scale: .95
+	}
+
+	80% {
+		scale: 1.04
+	}
+
+	100% {
+		opacity: .92;
+		scale: 1
+	}
+}
+
 .tl-pill {
 	position: relative;
 	display: flex;
@@ -1954,6 +2001,7 @@ body:has(.edark:not(.out)) .tlog {
 	.tl-pill,
 	.tl-pill::after,
 	.tl-st,
+	.tl-over,
 	.eflag .fl,
 	.eflag .cl,
 	.eumb {
