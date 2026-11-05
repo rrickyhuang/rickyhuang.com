@@ -82,7 +82,7 @@ window.HIKER_LINES = {
 			"stay for a bit.",
 			"is it raining?",
 			"enjoy the quiet.",
-			"wait a moment.",
+			"wait a moment."
 		]
 	},
 	/* same, but only while it is night */

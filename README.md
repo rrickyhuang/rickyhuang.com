@@ -4,6 +4,8 @@ Personal landing page. Plain static files in `site/`, published with GitHub Page
 
     site/index.html       the page (styles.css, app.js, assets/)
     site/lines.js         what the hiker says (edit the lists freely)
+                          pool = day lines, night = night lines, hints = nudges toward the easter eggs, keyed by egg
+                          (trail, fog, night, rain). About 1 in 5 taps shows a hint, only for eggs not yet stamped in the trail log.
     site/hiker.css, hiker.js   the hiker's bubble/animation CSS and helpers, shared by index.html and 404.html
                           (404.html loads them by root-relative path because it is served from any depth)
     site/404.html         "lost in the fog" page, served automatically for any missing URL
