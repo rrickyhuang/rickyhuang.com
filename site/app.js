@@ -297,7 +297,6 @@
     var a = 1 + .4 * (Math.min(tickles, 3) - 1);
     if (b.animate && !reduce) b.animate([{ transform: 'rotate(2deg)' }, { transform: 'rotate(' + (2 - 9 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 8 * a) + 'deg)' }, { transform: 'rotate(' + (2 - 5 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 3 * a) + 'deg)' }, { transform: 'rotate(2deg)' }], { duration: 900, easing: 'ease-out' });
     tone(900 + Math.min(tickles, 10) * 70, null, .1, .03, 'triangle');
-    if (tickles === 1 && !fogEnd) speak(words('hey, that tickles.'), 2400);
     if (tickles >= TICKLES) { tickles = 0; startEgg('fog') } else tickleT = setTimeout(function () { tickles = 0 }, 4000)
   });
 
