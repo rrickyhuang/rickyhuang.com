@@ -55,10 +55,7 @@ window.HIKER_LINES = {
 		"i like when its quiet.",
 		"you seem familiar.",
 		"those mushrooms look delicious!",
-		"check out those mushrooms!",
-		"rain is coming.",
-		"i feel like its gonna rain.",
-		"i think it might rain."
+		"check out those mushrooms!"
 	],
 	/* hints toward the easter eggs, keyed by egg (trail, fog, night, rain). about 1 in 5 daytime taps shows one,
 	   picked only from eggs not yet stamped in the trail log, so a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
@@ -66,13 +63,22 @@ window.HIKER_LINES = {
 		trail: [
 		],
 		fog: [
-			"the fern has a lot of feelings."
+			"plants have feelings too.",
+			"the plants are alive!",
+			"sometimes its nice to talk to a plant."
 		],
 		night: [
-			"i hear some mushrooms glow in the dark."
+			"i hear some mushrooms glow in the dark.",
+			"my dream job is a mushroom whisperer.",
+			"those mushrooms look delicious!",
 		],
 		rain: [
-			"stay long enough and the weather turns."
+			"stay long enough and the weather turns.",
+			"rain is coming.",
+			"i feel like its gonna rain.",
+			"i think it might rain.",
+			"be patient. the weather changes.",
+			"stay a while."
 		]
 	},
 	/* same, but only while it is night */
