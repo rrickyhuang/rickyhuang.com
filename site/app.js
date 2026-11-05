@@ -28,6 +28,15 @@
   var capQ = [], lastCap = '';
   var tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
+  /* egg hints (lines.js: hints.<egg>): about 1 in 5 daytime taps, drawn only from eggs that have not been stamped yet. keys match the egg names (trail, fog, night, rain). */
+  var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = [], lastHint = '';
+  function nextHint() {
+    var open = []; Object.keys(HINTS).forEach(function (k) { if (!TL.have[k] && HINTS[k]) HINTS[k].forEach(function (t) { open.push(t) }) });
+    if (!open.length) return null;
+    hintQ = hintQ.filter(function (t) { return open.indexOf(t) > -1 }); /* drop hints whose egg was just found */
+    if (!hintQ.length) { hintQ = shuffle(open.slice()); if (hintQ.length > 1 && hintQ[hintQ.length - 1] === lastHint) { var f = hintQ[0]; hintQ[0] = hintQ[hintQ.length - 1]; hintQ[hintQ.length - 1] = f } }
+    lastHint = hintQ.pop(); return lastHint
+  }
   function nextNight() { if (!nightQ.length) nightQ = shuffle(NIGHT.slice()); return nightQ.pop() }
   function nextCap() { if (!capQ.length) { capQ = shuffle(PLINES.slice()); if (capQ[capQ.length - 1] === lastCap) { var f = capQ[0]; capQ[0] = capQ[capQ.length - 1]; capQ[capQ.length - 1] = f } } lastCap = capQ.pop(); return lastCap }
   function nextPhoto() { if (!photoQ.length) photoQ = shuffle(PHOTOS.slice()); return photoQ.pop() }
@@ -49,7 +58,7 @@
       ph = nextPhoto();
       html = '<div class="pm"><button class="thumb" type="button" aria-label="open photo"><img alt="" src="' + ph.src + '"></button><span>' + nextCap() + '<small>tap to open</small></span></div>'; ms = 7500
     }
-    else { var t = nightEl ? nextNight() : nextText(); html = words(t); ms = Math.max(3400, 2400 + t.length * 50) }
+    else { var t = nightEl ? nextNight() : ((!nightEl && Math.random() < HINT_CHANCE && nextHint()) || nextText()); html = words(t); ms = Math.max(3400, 2400 + t.length * 50) }
     speak(html, ms, ph)
   }
   function speak(html, ms, ph) {
