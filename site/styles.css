@@ -1112,7 +1112,7 @@ li:hover .horn path:nth-child(3) {
 
 /* sound toggle */
 .snd {
-	position: absolute;
+	position: fixed;
 	right: calc(var(--m) - .45rem);
 	bottom: calc(var(--m) - .4rem);
 	z-index: 2;
@@ -1407,12 +1407,10 @@ body:has(.edark:not(.out)) .tlog {
 	}
 }
 
-/* desktop: sit above the sound button in the corner */
-@media (min-width: 761px) {
-	.tlog {
-		right: 1.1rem;
-		bottom: calc(var(--m) + 3rem) /* clear of the sound button (its top is at --m + 1.8rem) with a comfortable gap */
-	}
+/* the sound button is fixed in the bottom-right corner at every width; the log pill sits beside it, to its left, on the same line */
+.tlog {
+	right: calc(var(--m) + 2.05rem); /* sound button's right offset + its 2.2rem width + a .3rem gap */
+	bottom: calc(var(--m) - .25rem) /* centres the ~1.9rem pill on the 2.2rem button */
 }
 
 @media (max-width: 760px) {
@@ -1979,12 +1977,6 @@ body:has(.edark:not(.out)) .tlog {
 }
 
 @media (max-width:760px) {
-	.snd {
-		position: static;
-		align-self: flex-end;
-		margin: 1rem -.45rem 0 0
-	}
-
 	.eggbar span {
 		display: none
 	}
