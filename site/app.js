@@ -79,7 +79,7 @@
   var REM = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
   /* how dark it is at a distance from a torch hole (matches the mask in css) */
   function dk(d, a, b, c) { a *= REM; b *= REM; c *= REM; return d < a ? 0 : d < b ? .5 * (d - a) / (b - a) : d < c ? .5 + .5 * (d - b) / (c - b) : 1 }
-  function startEgg(n) { if (eggs[n]) eggs[n]() }
+  function startEgg(n) { if (Object.prototype.hasOwnProperty.call(eggs, n) && typeof eggs[n] === 'function') eggs[n]() }
   function egg() { startEgg('trail') }
   function endNight() { var f = nightEnd; nightEnd = null; if (f) f() }
   window.egg = function (n) { startEgg(n) };
