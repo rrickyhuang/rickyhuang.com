@@ -28,6 +28,16 @@
   var capQ = [], lastCap = '';
   var tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
+  /* egg hints (lines.js: hints.<egg>): about 1 in 5 taps (day or night), drawn only from eggs that have not been stamped yet. keys match the egg names (trail, fog, night, rain). */
+  var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = {}, lastHint = '', lastEgg = '';
+  /* picks an unfound egg first (never the same one twice running if another is open), then a line from that egg's own shuffled queue, so every egg gets equal airtime however many lines it has */
+  function nextHint() {
+    var open = Object.keys(HINTS).filter(function (k) { return !TL.have[k] && HINTS[k] && HINTS[k].length });
+    if (!open.length) return null;
+    var pool = open.length > 1 ? open.filter(function (k) { return k !== lastEgg }) : open, k = pool[Math.floor(Math.random() * pool.length)], q = hintQ[k];
+    if (!q || !q.length) { q = hintQ[k] = shuffle(HINTS[k].slice()); if (q.length > 1 && q[q.length - 1] === lastHint) { var f = q[0]; q[0] = q[q.length - 1]; q[q.length - 1] = f } }
+    lastEgg = k; lastHint = q.pop(); return lastHint
+  }
   function nextNight() { if (!nightQ.length) nightQ = shuffle(NIGHT.slice()); return nightQ.pop() }
   function nextCap() { if (!capQ.length) { capQ = shuffle(PLINES.slice()); if (capQ[capQ.length - 1] === lastCap) { var f = capQ[0]; capQ[0] = capQ[capQ.length - 1]; capQ[capQ.length - 1] = f } } lastCap = capQ.pop(); return lastCap }
   function nextPhoto() { if (!photoQ.length) photoQ = shuffle(PHOTOS.slice()); return photoQ.pop() }
@@ -49,7 +59,7 @@
       ph = nextPhoto();
       html = '<div class="pm"><button class="thumb" type="button" aria-label="open photo"><img alt="" src="' + ph.src + '"></button><span>' + nextCap() + '<small>tap to open</small></span></div>'; ms = 7500
     }
-    else { var t = nightEl ? nextNight() : nextText(); html = words(t); ms = Math.max(3400, 2400 + t.length * 50) }
+    else { var t = (Math.random() < HINT_CHANCE && nextHint()) || (nightEl ? nextNight() : nextText()); html = words(t); ms = Math.max(3400, 2400 + t.length * 50) }
     speak(html, ms, ph)
   }
   function speak(html, ms, ph) {
@@ -290,7 +300,6 @@
     var a = 1 + .4 * (Math.min(tickles, 3) - 1);
     if (b.animate && !reduce) b.animate([{ transform: 'rotate(2deg)' }, { transform: 'rotate(' + (2 - 9 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 8 * a) + 'deg)' }, { transform: 'rotate(' + (2 - 5 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 3 * a) + 'deg)' }, { transform: 'rotate(2deg)' }], { duration: 900, easing: 'ease-out' });
     tone(900 + Math.min(tickles, 10) * 70, null, .1, .03, 'triangle');
-    if (tickles === 1 && !fogEnd) speak(words('hey, that tickles.'), 2400);
     if (tickles >= TICKLES) { tickles = 0; startEgg('fog') } else tickleT = setTimeout(function () { tickles = 0 }, 4000)
   });
 

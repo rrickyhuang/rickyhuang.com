@@ -7,9 +7,7 @@ window.HIKER_LINES = {
 		"take the long way round.",
 		"look up.",
 		"take a seat.",
-		"is it raining?",
 		"pace yourself.",
-		"psst. the fern is ticklish.",
 		"hey, that tickles.",
 		"take a picture, itll last longer!",
 		"snack break? i always pack too many.",
@@ -17,12 +15,9 @@ window.HIKER_LINES = {
 		"its not an adventure if you know where youre going.",
 		"so much life.",
 		"whats around the corner?",
-		"look how far youve come!",
 		"one step at a time.",
 		"what a beautiful day!",
-		"wait a moment.",
 		"look around.",
-		"somethings on the horizon.",
 		"watch your step!",
 		"stay hydrated.",
 		"make good choices.",
@@ -36,11 +31,9 @@ window.HIKER_LINES = {
 		"enjoy the journey.",
 		"try something new today!",
 		"be kind.",
-		"enjoy the quiet.",
 		"i wish i was a bird.",
 		"things are looking up.",
 		"change is good.",
-		"lets move a mountain.",
 		"it doesnt get better than this!",
 		"are you scared?",
 		"youre so brave!",
@@ -53,13 +46,45 @@ window.HIKER_LINES = {
 		"life happens wherever you are, whether you make it or not.",
 		"hows it going?",
 		"i like when its quiet.",
-		"you seem familiar.",
-		"those mushrooms look delicious!",
-		"check out those mushrooms!",
-		"rain is coming.",
-		"i feel like its gonna rain.",
-		"i think it might rain."
+		"you seem familiar."
 	],
+	/* hints toward the easter eggs, keyed by egg (trail, fog, night, rain). about 1 in 5 taps shows one,
+	   an unstamped egg is picked first, then one of its lines, so every egg gets equal airtime however many lines it has; a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
+	hints: {
+		trail: [
+			"lets move mountains.",
+			"look how far youve come!",
+			"dont give up now!",
+			"somethings on the horizon.",
+			"keep climbing."
+		],
+		fog: [
+			"i love ferns.",
+			"plants have feelings too.",
+			"the plants are alive!",
+			"sometimes its nice to talk to a plant.",
+			"ferns like to be petted."
+		],
+		night: [
+			"i hear some mushrooms glow in the dark.",
+			"my dream job is a mushroom whisperer.",
+			"those mushrooms look delicious!",
+			"check out those mushrooms!",
+			"look deep within.",
+			"the mushrooms tell me secrets."
+		],
+		rain: [
+			"stay long enough and the weather turns.",
+			"rain is coming.",
+			"i feel like its gonna rain.",
+			"i think it might rain.",
+			"be patient. the weather changes.",
+			"stay for a bit.",
+			"is it raining?",
+			"enjoy the quiet.",
+			"wait a moment."
+		]
+	},
 	/* same, but only while it is night */
 	night: [
 		"so many fireflies.",
