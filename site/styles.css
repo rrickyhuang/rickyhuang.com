@@ -1227,80 +1227,30 @@ li:hover .horn path:nth-child(3) {
 	}
 }
 
-.estamp {
-	position: absolute;
-	width: min(68vw, 15rem);
-	aspect-ratio: 1;
-	margin: calc(min(68vw, 15rem)/-2) 0 0 calc(min(68vw, 15rem)/-2);
-	z-index: 2;
+/* egg stamps: the big one that thumps down when an egg is found */
+.bstamp {
+	position: fixed;
+	z-index: 6;
 	pointer-events: none;
 	color: var(--acc);
 	mix-blend-mode: multiply;
-	opacity: 0;
-	rotate: -9deg;
-	animation: estamp .52s cubic-bezier(.55, 0, .9, .45) .45s both
+	opacity: 0
 }
 
-.estamp svg {
+.bstamp svg {
 	display: block;
 	width: 100%;
 	height: 100%
 }
 
-.estamp.fade {
-	animation: efadeout 1s ease forwards
+/* over the dark hero or the night layer, ink can't multiply: print it pale instead */
+.bstamp.ondark {
+	mix-blend-mode: normal;
+	color: #EDB9A0 !important
 }
 
-.estamp.out {
-	animation: efadeout .5s ease forwards
-}
-
-@keyframes efadeout {
-	from {
-		opacity: .92;
-		scale: 1;
-		rotate: -9deg
-	}
-
-	to {
-		opacity: 0;
-		scale: 1;
-		rotate: -9deg
-	}
-}
-
-@keyframes estamp {
-	0% {
-		opacity: 0;
-		scale: 2.1;
-		rotate: -2deg
-	}
-
-	62% {
-		opacity: .95;
-		scale: .95;
-		rotate: -11deg
-	}
-
-	80% {
-		scale: 1.03
-	}
-
-	100% {
-		opacity: .92;
-		scale: 1;
-		rotate: -9deg
-	}
-}
-
-.emush {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 0;
-	z-index: 1;
-	pointer-events: none
+.bstamp.night.ondark {
+	color: #E4E6C8 !important
 }
 
 .em {
@@ -1756,16 +1706,6 @@ li:hover .horn path:nth-child(3) {
 		margin: 1rem -.45rem 0 0
 	}
 
-	.estamp {
-		width: min(60vw, 12rem);
-		margin: calc(min(60vw, 12rem)/-2) 0 0 calc(min(60vw, 12rem)/-2)
-	}
-
-	.estamp.ondark {
-		mix-blend-mode: normal;
-		color: #EDB9A0
-	}
-
 	.eggbar span {
 		display: none
 	}
@@ -1778,7 +1718,6 @@ li:hover .horn path:nth-child(3) {
 @media (prefers-reduced-motion:reduce) {
 
 	.em,
-	.estamp,
 	.eflag .fl,
 	.eflag .cl,
 	.eumb {

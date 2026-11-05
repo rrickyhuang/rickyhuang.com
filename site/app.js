@@ -130,14 +130,74 @@
   /* ---- trail complete: flag planted where he stood (stays until clicked), stamp, mushrooms ---- */
   var FLAG = '<svg viewBox="0 0 22 40" width="14" height="26" aria-hidden="true"><path d="M3 39V2" stroke="var(--ink)" stroke-width="1.7" stroke-linecap="round"/><path class="cl" d="M3.6 3C9 .8 12 6 21 3.4V15C12 17.6 9 12.4 3.6 15Z" fill="var(--acc)"/></svg>';
   function shroom() { return '<svg class="em" aria-hidden="true"><use href="#shroom"/></svg>' }
-  function stampSvg() {
+  /* ---- stamps: one per egg. every stamp has the same layout (label, rule, art, date, domain) but its own shape and ink ---- */
+  var STAMPS = [
+    { k: 'trail', name: 'summited', ink: '#BF4F2D' },
+    { k: 'fog', name: 'in a haze', ink: '#6F7C44' },
+    { k: 'night', name: 'after dark', ink: '#2E3B21' },
+    { k: 'rain', name: 'rain or shine', ink: '#4D7370' }
+  ], stampUid = 0;
+  function stampOf(k) { for (var i = 0; i < STAMPS.length; i++) if (STAMPS[i].k === k) return STAMPS[i] }
+  function oct(r) { var p = []; for (var i = 0; i < 8; i++) { var a = (22.5 + 45 * i) * Math.PI / 180; p.push((100 + r * Math.cos(a)).toFixed(1) + ',' + (100 + r * Math.sin(a)).toFixed(1)) } return p.join(' ') }
+  function stampShape(k, a) {
+    if (k === 'trail') return '<circle cx="100" cy="100" r="95" ' + a + '/>';
+    if (k === 'fog') return '<rect x="8" y="8" width="184" height="184" rx="20" ' + a + '/>';
+    if (k === 'night') return '<polygon points="' + oct(95) + '" ' + a + '/>';
+    return '<path d="M12 192V100a88 88 0 0 1 176 0V192z" ' + a + '/>'
+  }
+  /* the big dipper, plotted from real positions [ra deg, dec deg, size]; sky-chart orientation (east on the left) */
+  var DIPPER = { dubhe: [165.9, 61.75, 2.6], merak: [165.5, 56.38, 2.2], phecda: [178.5, 53.69, 2.2], megrez: [183.9, 57.03, 1.8], alioth: [193.5, 55.96, 2.8], mizar: [200.98, 54.93, 2.5], alkaid: [206.9, 49.31, 2.6] };
+  function dip(n) { var d = DIPPER[n]; return { x: 100 - (d[0] - 186) * .56 * 3.6, y: 118 - (d[1] - 56) * 3.6, r: d[2] } }
+  var SF = 'font-family="Young Serif,Georgia,serif"', SS = 'font-family="Instrument Sans,sans-serif" font-weight="600"';
+  function stampFoot() {
     var d = new Date().toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' }).toLowerCase();
-    return '<svg viewBox="0 0 200 200" aria-hidden="true"><defs><path id="ering" d="M100 100m-73 0a73 73 0 1 1 146 0a73 73 0 1 1-146 0"/></defs>'
-      + '<circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="3.2"/><circle cx="100" cy="100" r="88.5" fill="none" stroke="currentColor" stroke-width="1"/>'
-      + '<circle cx="100" cy="100" r="56" fill="none" stroke="currentColor" stroke-width="1.4"/>'
-      + '<text font-family="Young Serif,Georgia,serif" font-size="15.5" fill="currentColor"><textPath href="#ering" textLength="452" lengthAdjust="spacing">trail complete  ·  rickyhuang.com  ·  summit reached  ·  </textPath></text>'
-      + '<path d="M70 118l20-30 11 14 8-10 21 26z" fill="currentColor"/><path d="M118 92v-17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M118.6 75.4c4-1.4 6 1.6 11 .2v7.4c-5 1.4-7-1.6-11-.2z" fill="currentColor"/>'
-      + '<text x="100" y="136" text-anchor="middle" font-family="Instrument Sans,sans-serif" font-weight="600" font-size="9.5" letter-spacing="1.4" fill="currentColor">' + d + '</text></svg>'
+    return '<text x="100" y="156" text-anchor="middle" ' + SS + ' font-size="9.5" letter-spacing="1.4" fill="currentColor">' + d + '</text><text x="100" y="168" text-anchor="middle" ' + SS + ' font-size="7" letter-spacing="1.8" fill="currentColor" opacity=".8">RICKYHUANG.COM</text>'
+  }
+  function stampSvg(k) {
+    var id = ++stampUid, s = '<svg viewBox="0 0 200 200" aria-hidden="true"><g filter="url(#estink)">';
+    s += '<text x="100" y="56" text-anchor="middle" ' + SF + ' font-size="15.5" fill="currentColor">' + stampOf(k).name + '</text><path d="M64 63.500h72" stroke="currentColor" stroke-width="1"/>';
+    if (k === 'trail') {
+      s += '<circle cx="100" cy="100" r="95" fill="none" stroke="currentColor" stroke-width="3.2"/><circle cx="100" cy="100" r="88.500" fill="none" stroke="currentColor" stroke-width="1"/>'
+        + '<g transform="translate(-2,14)"><path d="M70 118l20-30 11 14 8-10 21 26z" fill="currentColor"/><path d="M118 92v-17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M118.600 75.400c4-1.400 6 1.600 11 .2v7.400c-5 1.400-7-1.600-11-.2z" fill="currentColor"/></g>'
+    } else if (k === 'fog') {
+      s += '<defs><mask id="sm' + id + '"><rect width="200" height="200" fill="#fff"/><path d="M30 112q17-10 34 0t34 0t34 0t34 0" fill="none" stroke="#000" stroke-width="7"/><path d="M20 128q17-10 34 0t34 0t34 0t34 0t34 0" fill="none" stroke="#000" stroke-width="7"/></mask></defs>'
+        + stampShape('fog', 'fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 11.200"')
+        + '<rect x="24" y="24" width="152" height="152" rx="10" fill="none" stroke="currentColor" stroke-width="1.400"/>'
+        + '<g transform="translate(0,-6)"><g mask="url(#sm' + id + ')" fill="currentColor"><path d="M62 144l14-38 14 38zM84 144l18-54 18 54zM112 144l13-34 13 34z"/></g><path d="M36 124q16-9 32 0t32 0t32 0t32 0" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linecap="round" opacity=".7"/></g>'
+    } else if (k === 'night') {
+      var pts = ['alkaid', 'mizar', 'alioth', 'megrez', 'dubhe', 'merak', 'phecda', 'megrez'].map(function (n) { var q = dip(n); return q.x.toFixed(1) + ',' + q.y.toFixed(1) }).join(' '), du = dip('dubhe');
+      s += stampShape('night', 'fill="none" stroke="currentColor" stroke-width="3.200" stroke-linejoin="round"') + '<polygon points="' + oct(87) + '" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>'
+        + '<path d="M60 76a14 14 0 1 0 9 25a11.500 11.500 0 1 1-9-25z" fill="currentColor"/>'
+        + '<path d="M' + du.x.toFixed(1) + ' ' + (du.y - 4).toFixed(1) + 'L143 82" stroke="currentColor" stroke-width="1" stroke-dasharray="1.500 3" fill="none"/>' /* the pointers aim at polaris */
+        + '<polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="1.200" stroke-linejoin="round" opacity=".85"/><g fill="currentColor">'
+        + Object.keys(DIPPER).map(function (n) { var q = dip(n); return '<circle cx="' + q.x.toFixed(1) + '" cy="' + q.y.toFixed(1) + '" r="' + q.r + '"/>' }).join('')
+        + '<circle cx="143" cy="76" r="3.400"/><circle cx="88" cy="94" r="1.100"/><circle cx="118" cy="88" r="1.200"/><circle cx="74" cy="106" r="1"/><circle cx="114" cy="144" r="1.200"/><circle cx="160" cy="128" r="1.100"/></g>'
+        + '<path d="M143 69v14M136 76h14" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>'
+    } else {
+      s += stampShape('rain', 'fill="none" stroke="currentColor" stroke-width="3.200" stroke-linejoin="round"') + '<path d="M24 186V100a76 76 0 0 1 152 0V186z" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/>'
+        + '<g transform="translate(0,-4)"><path d="M62 112a38 38 0 0 1 76 0q-9.500-8-19 0q-9.500-8-19 0q-9.500-8-19 0q-9.500-8-19 0z" fill="currentColor"/><path d="M100 112v26q0 9-8 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
+        + '<g stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M50 88l-3 9M152 84l-3 9M36 118l-3 9M164 114l-3 9M126 136l-3 9M74 138l-3 9"/></g></g>'
+    }
+    return s + stampFoot() + '</g></svg>'
+  }
+  /* the big stamp thumping down mid-screen. resolves with its box once it has landed and rested. */
+  function bigStamp(kind) {
+    var mob = innerWidth <= 760, size = Math.round(Math.min(innerWidth * (mob ? .6 : .68), (mob ? 12 : 15) * REM)), cx = mob ? innerWidth / 2 : innerWidth * .76, cy = innerHeight * (mob ? .27 : .6),
+      pl = document.querySelector('.pl'), n = el('div', 'bstamp ' + kind, stampSvg(kind)), box = { n: n, size: size, cx: cx, cy: cy };
+    n.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + Math.round(cx - size / 2) + 'px;top:' + Math.round(cy - size / 2) + 'px;color:' + stampOf(kind).ink;
+    if (kind === 'night' || (mob && pl && cy < pl.getBoundingClientRect().bottom)) n.classList.add('ondark');
+    document.body.appendChild(n);
+    if (reduce || !n.animate) { n.style.opacity = '.92'; return Promise.resolve(box) }
+    return n.animate([{ opacity: 0, transform: 'scale(2.1) rotate(-2deg)' }, { opacity: .95, transform: 'scale(.95) rotate(-11deg)', offset: .62 }, { transform: 'scale(1.03) rotate(-9deg)', offset: .8 }, { opacity: .92, transform: 'scale(1) rotate(-9deg)' }],
+      { duration: 520, easing: 'cubic-bezier(.55,0,.9,.45)', fill: 'forwards' }).finished.then(function () { return new Promise(function (r) { setTimeout(function () { r(box) }, 850) }) })
+  }
+  /* an egg was found. quiet = the egg already made its own thud */
+  function collect(kind, quiet) {
+    var done = bigStamp(kind); if (!quiet) setTimeout(sfx.thud, 320);
+    done.then(function (b) {
+      if (!b.n.animate) { if (b.n.parentNode) b.n.parentNode.removeChild(b.n); return }
+      b.n.animate([{ opacity: .92 }, { opacity: 0 }], { duration: 1000, easing: 'ease', fill: 'forwards' }).finished.then(function () { if (b.n.parentNode) b.n.parentNode.removeChild(b.n) })
+    })
   }
   function sprout(ctx, px, delay, k) { var s = 9 + Math.random() * 9, m = el('span', '', shroom()).firstChild; m.style.cssText = 'left:' + px.toFixed(0) + 'px;--s:' + s.toFixed(1) + ';--d:' + delay + 'ms;--k:' + k; ctx.mc.appendChild(m); ctx.n++ }
   function freeSpot(ctx) { for (var i = 0; i < 12; i++) { var px = 10 + Math.random() * (host.clientWidth - 20), gx = px + ctx.hr.left, ok = Math.abs(px - ctx.fx) > 16; ctx.spans.forEach(function (r) { if (gx > r.left - 12 && gx < r.right + 12) ok = false }); if (ok) return px } return -1 }
@@ -146,13 +206,10 @@
     var T = timers(), hr = host.getBoundingClientRect(), spans = [].map.call(host.querySelectorAll('.lab>span'), function (s) { return s.getBoundingClientRect() });
     var fx = x + W / 2; spans.forEach(function (r) { var l = r.left - hr.left, rr = r.right - hr.left; if (fx > l - 8 && fx < rr + 8) fx = (fx - l < rr - fx) ? l - 12 : rr + 12 });
     fx = Math.max(8, Math.min(host.clientWidth - 8, fx));
-    var flag = el('button', 'eflag', '<span class="fl">' + FLAG + '</span>'), st = el('div', 'estamp', stampSvg()), mc = el('span', 'emush'), ctx = { mc: mc, fx: fx, hr: hr, spans: spans, n: 0 };
+    var flag = el('button', 'eflag', '<span class="fl">' + FLAG + '</span>'), mc = el('span', 'emush'), ctx = { mc: mc, fx: fx, hr: hr, spans: spans, n: 0 };
     flag.type = 'button'; flag.setAttribute('aria-label', 'pull up the flag'); flag.style.left = fx.toFixed(0) + 'px';
     host.appendChild(flag); host.appendChild(mc); sfx.pip();
-    var mob = innerWidth <= 760, cx = mob ? innerWidth / 2 : innerWidth * .76, cy = scrollY + innerHeight * (mob ? .27 : .6), pl = document.querySelector('.pl');
-    st.style.left = cx + 'px'; st.style.top = cy + 'px';
-    if (mob && pl && cy < pl.getBoundingClientRect().bottom + scrollY) st.classList.add('ondark');
-    below(st);
+    T.at(function () { collect('trail', true) }, 450); /* thumps down with the egg's own thud at ~760ms */
     hk.classList.remove('hop'); void hk.offsetWidth; hk.classList.add('hop');
     T.at(function () { speak(words('you made it to the top!'), 4400) }, 250);
     T.at(function () { sfx.thud(); if (reduce) return; var s = document.querySelector('.stage'); if (s && s.animate) s.animate([{ transform: 'none' }, { transform: 'translateY(4px)' }, { transform: 'translateY(-1px)' }, { transform: 'none' }], { duration: 240, easing: 'ease-out' }) }, 760);
@@ -162,8 +219,7 @@
         spans.forEach(function (r) { if (gx > r.left - 12 && gx < r.right + 12) ok = false }); if (!ok) continue; sprout(ctx, px, k * 75, k); sfx.bloop(k); k++
       }
     }, 900);
-    T.at(function () { st.classList.add('fade') }, 5200);
-    function undo() { T.clear(); trailUndo = null; trailCtx = null; gone(flag, 450); gone(st, 600); mc.classList.add('out'); setTimeout(function () { if (mc.parentNode) mc.parentNode.removeChild(mc) }, 1800) }
+    function undo() { T.clear(); trailUndo = null; trailCtx = null; gone(flag, 450); mc.classList.add('out'); setTimeout(function () { if (mc.parentNode) mc.parentNode.removeChild(mc) }, 1800) }
     trailUndo = undo; trailCtx = ctx; flag.addEventListener('click', function (e) { e.stopPropagation(); undo() })
   };
 
@@ -175,6 +231,7 @@
     T.at(function () { speak(words(nt || nightEl ? 'fog at night. very spooky.' : 'oh. fog.'), 2800) }, 300);
     T.at(function () { f.classList.add('lift'); if (stop) stop(3.4) }, 5400);
     T.at(function () { speak(words(nightEl ? 'like ships passing in the night.' : 'gone with the wind.'), 4200) }, 7400);
+    T.at(function () { collect('fog') }, 1500);
     T.at(function () { fogEnd() }, 9800);
     fogEnd = function () { T.clear(); fogEnd = null; if (stop) stop(.6); gone(f, 1200) }
   };
@@ -238,6 +295,7 @@
     /* crickets (only when sound is on, and they hush while it rains) */
     cr = setInterval(function () { if (rainEnd || !snd.on) return; var n = 3 + ((Math.random() * 3) | 0); for (var k = 0; k < n; k++)tone(4300, 4300, .05, .008, 'sine', k * .075) }, 2200);
     T.at(function () { speak(words(rainEnd ? 'rainy night. cozy.' : 'getting dark. good thing i packed a headlamp.'), 5200) }, 450);
+    T.at(function () { collect('night') }, 1500); /* stamped at sunset, as the light goes */
     nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); layers.forEach(function (l) { gone(l, 1800) }) }
   };
   /* the odd mushroom in the about section: inert until night has happened once (remembered), then the day/night toggle.
@@ -266,7 +324,8 @@
   /* ---- rain: after 180s of visible time. gentle. ---- */
   var UMB = '<span class="ui"><svg viewBox="0 0 28 26" width="28" height="26" aria-hidden="true"><path d="M14 9.500V21c0 1.800-3 1.800-3 0" stroke="var(--ink)" stroke-width="1.400" fill="none" stroke-linecap="round"/><path d="M1 9.500C3 3.500 8 .8 14 .8S25 3.500 27 9.500q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0z" fill="var(--acc)"/><path d="M14 .8V-.5" stroke="var(--ink)" stroke-width="1.200" stroke-linecap="round"/></svg></span>';
   eggs.rain = function () {
-    if (rainEnd || reduce) return;
+    if (rainEnd) return;
+    if (reduce) { collect('rain'); return } /* no rain for reduced motion, but they still earn the stamp */
     var T = timers(), c = el('canvas', 'erain'), g = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W0 = 0, H0 = 0, drops = [], alive = true, raf = 0, t0 = performance.now(), last = t0, ending = 0, fade = 0, umb = el('span', 'eumb', UMB), stopBed = null, plink = 0, grow = 0;
     function size() { W0 = innerWidth; H0 = innerHeight; c.width = W0 * dpr; c.height = H0 * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0) }
     size(); addEventListener('resize', size);
@@ -274,6 +333,7 @@
     for (var i = 0; i < N; i++)drops.push({ x: Math.random() * (W0 + 160) - 40, y: Math.random() * H0, l: 12 + Math.random() * 12, v: 640 + Math.random() * 320, a: .4 + Math.random() * .4 });
     below(c); hk.appendChild(umb); hk.classList.add('rainy'); stopBed = bed('bandpass', 1500, .35, .011, 3);
     T.at(function () { speak(words('rain again?'), 3000) }, 600);
+    T.at(function () { collect('rain') }, 1800);
     function loop(t) {
       if (!alive) return; var dt = Math.min(.05, (t - last) / 1000); last = t;
       if (ending) fade = Math.max(0, fade - dt / 4); else fade = Math.min(1, fade + dt / 3);

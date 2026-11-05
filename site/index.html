@@ -29,6 +29,14 @@
 </head>
 
 <body><svg width="0" height="0" style="position:absolute" aria-hidden="true">
+		<!-- rough rubber-stamp edge for the egg stamps: wobbles the outline and drops out a few specks -->
+		<filter id="estink" x="-5%" y="-5%" width="110%" height="110%">
+			<feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4" result="n" />
+			<feDisplacementMap in="SourceGraphic" in2="n" scale="3" result="d" />
+			<feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="2" seed="9" result="n2" />
+			<feColorMatrix in="n2" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  9 0 0 0 -5.5" result="sp" />
+			<feComposite in="d" in2="sp" operator="out" />
+		</filter>
 		<symbol id="shroom" viewBox="0 0 24 24">
 			<path d="M12 3C6.4 3 2.8 7.1 2.8 11.6c0 .7.5 1.2 1.2 1.2h16c.7 0 1.2-.5 1.2-1.2C21.2 7.1 17.6 3 12 3z"
 				fill="currentColor" />
