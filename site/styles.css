@@ -1165,9 +1165,9 @@ li:hover .horn path:nth-child(3) {
 	display: none
 }
 
-/* the paper card would glare in the dark: dim it with the night layer */
+/* at night the log sits under the dark layer (z-index 3), like the other things in the world, so only the flashlight and the hiker's lamp light it up */
 body:has(.edark:not(.out)) .tlog {
-	filter: brightness(.5) saturate(.75)
+	z-index: 2
 }
 
 .tlog.pop {
@@ -1411,7 +1411,7 @@ body:has(.edark:not(.out)) .tlog {
 @media (min-width: 761px) {
 	.tlog {
 		right: 1.1rem;
-		bottom: 4.4rem
+		bottom: calc(var(--m) + 3rem) /* clear of the sound button (its top is at --m + 1.8rem) with a comfortable gap */
 	}
 }
 
