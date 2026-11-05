@@ -4,6 +4,8 @@
   var legL = hk.querySelector('.legL'), legR = hk.querySelector('.legR'), pole = hk.querySelector('.pole'), bodyg = hk.querySelector('.bodyg'),
     say = hk.querySelector('.say'), hit = hk.querySelector('.hit');
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* must match the `@media (max-width:760px)` blocks in styles.css (the single-column layout) */
+  var narrow = matchMedia('(max-width:760px)');
   var x = 0, v = 0, dir = 1, dirS = 1, phase = 0, tx = 0, wait = 0, pause = 2.5, mouseX = null, lastMove = -1e9, since = 0, walking = false, frozen = false, hideT = null, prev = performance.now();
   var VMAX_CHASE = 190, VMAX_STROLL = 34, ACC = 220, DEC = 420, K = 1.8, DEAD = 30, REACT = 180;
   /* ---- words. edit freely. lowercase, no apostrophes. ---- */
@@ -32,7 +34,8 @@
   function nextPhoto() { if (!photoQ.length) photoQ = shuffle(PHOTOS.slice()); return photoQ.pop() }
   function pickVar() { var q; do { q = VARS[Math.floor(Math.random() * VARS.length)] } while (q === lastVar); lastVar = q; return q }
   function words(t) { return t.split(' ').map(function (w, i) { return '<span class="w" style="--i:' + i + '">' + w + '</span>' }).join(' ') }
-  function hw() { return Math.max(0, host.clientWidth - W - (window.innerWidth > 760 ? 84 : 0)) }
+  /* 84 = room kept clear at the right end of the header for the fern (.pr .hdr .bough in styles.css: 70px wide + right:.2rem + a little air); it is display:none in the narrow layout, so nothing is reserved there */
+  function hw() { return Math.max(0, host.clientWidth - W - (narrow.matches ? 0 : 84)) }
   function clamp(a, lo, hi) { return Math.max(lo, Math.min(hi, a)) }
   function pick() { var t; for (var i = 0; i < 6; i++) { t = Math.random() * hw(); if (Math.abs(t - x) > 50) break } tx = t }
   addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
@@ -147,7 +150,7 @@
     var flag = el('button', 'eflag', '<span class="fl">' + FLAG + '</span>'), st = el('div', 'estamp', stampSvg()), mc = el('span', 'emush'), ctx = { mc: mc, fx: fx, hr: hr, spans: spans, n: 0 };
     flag.type = 'button'; flag.setAttribute('aria-label', 'pull up the flag'); flag.style.left = fx.toFixed(0) + 'px';
     host.appendChild(flag); host.appendChild(mc); sfx.pip();
-    var mob = innerWidth <= 760, cx = mob ? innerWidth / 2 : innerWidth * .76, cy = scrollY + innerHeight * (mob ? .27 : .6), pl = document.querySelector('.pl');
+    var mob = narrow.matches, cx = mob ? innerWidth / 2 : innerWidth * .76, cy = scrollY + innerHeight * (mob ? .27 : .6), pl = document.querySelector('.pl');
     st.style.left = cx + 'px'; st.style.top = cy + 'px';
     if (mob && pl && cy < pl.getBoundingClientRect().bottom + scrollY) st.classList.add('ondark');
     below(st);

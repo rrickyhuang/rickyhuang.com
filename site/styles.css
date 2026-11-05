@@ -1049,6 +1049,7 @@ li:hover .horn path:nth-child(3) {
 	transform: translate(-50%, 6px) rotate(225deg)
 }
 
+/* 760px is also hardcoded as `narrow` in app.js (hiker walkable width, trail stamp); change both together */
 @media (max-width:760px) {
 	.stage {
 		display: block
