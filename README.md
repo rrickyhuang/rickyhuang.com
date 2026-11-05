@@ -27,8 +27,20 @@ the fallback for when Letterboxd is unreachable, and the page shows no film bubb
 
 ## Photos
 
-The hiker's photo bubbles stay off while `PHOTOS` in `site/app.js` is empty. To add some:
-export from Darktable (sRGB JPEG, 2400 px long edge, geo tags off), run
-`python3 tools/prep_photos.py --src <export folder> --out site`, then add entries to `PHOTOS`
-(`src`, `title`, `meta`, optional `ratio`). The hero photo on the left panel is
-`site/assets/hero-forest.jpg`.
+`tools/prep_photos.py` is the start of a photo gallery pipeline (a gallery is planned), which is why it
+makes three sizes, JPEG/WebP (optional AVIF), blurred placeholders and a `photos.json` rather than just
+a thumbnail. It also strips location data and then verifies that none survived, which is the part that
+matters for privacy even before a gallery exists.
+
+Workflow: export from Darktable (sRGB JPEG, 2400 px long edge, geo tags off), then run
+`python3 tools/prep_photos.py --src <export folder> --out site` from the repo root. It writes:
+
+    site/photos/          resized images
+    site/photos.json      list for the site (title, place, alt, sizes, srcset, placeholder)
+    photos.meta.json      in the folder you run it from (repo root); hand-edit titles, places and
+                          alt text here, new photos get a stub entry. Commit it: it is the source
+                          of that text, and the next run merges it into photos.json.
+
+Nothing reads `photos.json` yet. Until the gallery exists, the hiker's photo bubbles stay off while
+`PHOTOS` in `site/app.js` is empty; to try one, add entries to `PHOTOS` by hand (`src`, `title`,
+`meta`, optional `ratio`). The hero photo on the left panel is `site/assets/hero-forest.jpg`.
