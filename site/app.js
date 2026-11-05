@@ -373,11 +373,10 @@
   var UMB = '<span class="ui"><svg viewBox="0 0 28 26" width="28" height="26" aria-hidden="true"><path d="M14 9.500V21c0 1.800-3 1.800-3 0" stroke="var(--ink)" stroke-width="1.400" fill="none" stroke-linecap="round"/><path d="M1 9.500C3 3.500 8 .8 14 .8S25 3.500 27 9.500q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0q-1.600 1.600-3.250 0z" fill="var(--acc)"/><path d="M14 .8V-.5" stroke="var(--ink)" stroke-width="1.200" stroke-linecap="round"/></svg></span>';
   eggs.rain = function () {
     if (rainEnd) return;
-    if (reduce) { collect('rain'); return } /* no rain for reduced motion, but they still earn the stamp */
-    var T = timers(), c = el('canvas', 'erain'), g = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W0 = 0, H0 = 0, drops = [], alive = true, raf = 0, t0 = performance.now(), last = t0, ending = 0, fade = 0, umb = el('span', 'eumb', UMB), stopBed = null, plink = 0, grow = 0;
+    var T = timers(), c = el('canvas', 'erain'), g = c.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W0 = 0, H0 = 0, drops = [], alive = true, raf = 0, t0 = performance.now(), last = t0, ending = 0, fade = 0, umb = el('span', 'eumb', UMB), stopBed = null, plink = 0, grow = 0, still = 0;
     function size() { W0 = innerWidth; H0 = innerHeight; c.width = W0 * dpr; c.height = H0 * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0) }
     size(); addEventListener('resize', size);
-    var N = Math.round(Math.max(55, Math.min(140, innerWidth * innerHeight / 12000)));
+    var N = Math.round(Math.max(55, Math.min(140, innerWidth * innerHeight / 12000)) * (reduce ? .6 : 1)); /* reduced motion: a still drizzle, fewer streaks, nothing falls */
     for (var i = 0; i < N; i++)drops.push({ x: Math.random() * (W0 + 160) - 40, y: Math.random() * H0, l: 12 + Math.random() * 12, v: 640 + Math.random() * 320, a: .4 + Math.random() * .4 });
     below(c); hk.appendChild(umb); hk.classList.add('rainy'); stopBed = bed('bandpass', 1500, .35, .011, 3);
     T.at(function () { speak(words('rain again?'), 3000) }, 600);
@@ -386,8 +385,12 @@
       if (!alive) return; var dt = Math.min(.05, (t - last) / 1000); last = t;
       if (ending) fade = Math.max(0, fade - dt / 4); else fade = Math.min(1, fade + dt / 3);
       g.clearRect(0, 0, W0, H0); g.lineWidth = 1.25; g.strokeStyle = 'rgb(112,150,162)';
+      if (reduce) { /* no falling: a faint cool wash, and the streaks are re-scattered every couple of seconds */
+        if (t > still) { still = t + 2500; drops.forEach(function (d) { d.x = Math.random() * (W0 + 160) - 40; d.y = Math.random() * H0 }) }
+        g.globalAlpha = fade * .07; g.fillStyle = 'rgb(112,150,162)'; g.fillRect(0, 0, W0, H0)
+      }
       for (var k = 0; k < drops.length; k++) {
-        var d = drops[k]; d.y += d.v * dt; d.x -= d.v * dt * .16; if (d.y > H0 + 20) { d.y = -20; d.x = Math.random() * (W0 + 160) - 40 } if (d.x < -40) d.x += W0 + 80;
+        var d = drops[k]; if (!reduce) { d.y += d.v * dt; d.x -= d.v * dt * .16; if (d.y > H0 + 20) { d.y = -20; d.x = Math.random() * (W0 + 160) - 40 } if (d.x < -40) d.x += W0 + 80 }
         g.globalAlpha = d.a * fade; g.beginPath(); g.moveTo(d.x, d.y); g.lineTo(d.x + d.l * .16, d.y - d.l); g.stroke()
       }
       if (snd.on && t > plink) {
