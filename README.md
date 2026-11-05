@@ -19,7 +19,9 @@ Personal landing page. Plain static files in `site/`, published with GitHub Page
 Repo Settings > Pages > Source: **GitHub Actions**, custom domain `rickyhuang.com`.
 `.github/workflows/deploy.yml` publishes `site/` on every push to `main` and once a day
 (refreshing `film.json` first). Commits made by a workflow do not trigger Pages builds,
-which is why film.json is generated at deploy time instead of being committed.
+so the refreshed `film.json` is published but never committed back: the copy in git is only
+the fallback for when Letterboxd is unreachable, and the page shows no film bubble if
+`film.json` can't be loaded at all.
 
 ## Photos
 
