@@ -191,12 +191,46 @@
     return n.animate([{ opacity: 0, transform: 'scale(2.1) rotate(-2deg)' }, { opacity: .95, transform: 'scale(.95) rotate(-11deg)', offset: .62 }, { transform: 'scale(1.03) rotate(-9deg)', offset: .8 }, { opacity: .92, transform: 'scale(1) rotate(-9deg)' }],
       { duration: 520, easing: 'cubic-bezier(.55,0,.9,.45)', fill: 'forwards' }).finished.then(function () { return new Promise(function (r) { setTimeout(function () { r(box) }, 850) }) })
   }
+  /* ---- trail log: a pocket book of the stamps found so far. lives in memory only, so it clears when the visitor leaves or refreshes ---- */
+  var TL = { n: 0, total: 0, have: {}, open: false, touched: false, timer: 0, root: null, pill: null }, TLROT = [-7, 5, -4, 8];
+  var BOOK = '<svg width="16" height="14" viewBox="0 0 16 14" aria-hidden="true"><path d="M1 2.2C4 1 6.2 1.2 8 2.8 9.8 1.2 12 1 15 2.2V12C12 10.8 9.8 11 8 12.6 6.2 11 4 10.8 1 12z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 2.800v9.800" stroke="currentColor" stroke-width="1.300"/></svg>';
+  function retrig(n, cls) { n.classList.remove(cls); void n.offsetWidth; n.classList.add(cls) }
+  function setOpen(v) { TL.open = v; TL.root.classList.toggle('open', v); TL.pill.setAttribute('aria-expanded', v ? 'true' : 'false') }
+  function closeLog() { TL.touched = true; clearTimeout(TL.timer); if (TL.root && TL.open) setOpen(false) }
+  function buildLog() {
+    var r = el('aside', 'tlog'); r.setAttribute('aria-label', 'trail log'); r.hidden = true;
+    r.innerHTML = '<div class="tl-card" id="tl-card"><h4><span class="tl-ttl">trail log</span><i class="tl-cnt">0/4</i></h4><div class="tl-grid">'
+      + STAMPS.map(function (s) { return '<div class="tl-cell"><span class="tl-slot" data-k="' + s.k + '"><span class="tl-gh"><svg viewBox="0 0 200 200" aria-hidden="true">' + stampShape(s.k, 'fill="none" stroke="currentColor" stroke-width="6" stroke-dasharray="11 10" stroke-linejoin="round"') + '</svg></span><span class="tl-q">?</span></span><b class="tl-nm tl-unk">?</b></div>' }).join('')
+      + '</div></div><button class="tl-pill" type="button" aria-expanded="false" aria-controls="tl-card" aria-label="trail log, 0 of 4 stamps">' + BOOK + '<span class="tl-pc">0/4</span></button><span class="tl-sr" role="status" aria-live="polite"></span>';
+    document.body.appendChild(r); TL.root = r; TL.pill = r.querySelector('.tl-pill');
+    TL.pill.addEventListener('click', function () { TL.touched = true; clearTimeout(TL.timer); setOpen(!TL.open) });
+    document.addEventListener('click', function (e) { if (TL.open && !r.contains(e.target)) closeLog() });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape' && TL.open) closeLog() })
+  }
+  /* the big stamp flies to wherever the log is at the moment it takes off: its slot if the card is open, the pill if not */
+  function flyStamp(b, st) {
+    var toPill = !TL.open, r = (toPill ? TL.pill : st).getBoundingClientRect(), n = b.n, sc = (toPill ? 14 : r.width) / b.size;
+    var dx = r.left + r.width / 2 - b.cx, dy = r.top + r.height / 2 - b.cy;
+    if (reduce || !n.animate) return new Promise(function (res) { setTimeout(function () { res(toPill) }, 1400) });
+    return n.animate([{ opacity: .92, transform: 'scale(1) rotate(-9deg)' }, { opacity: 1, transform: 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + sc.toFixed(3) + ') rotate(' + st.__rot + 'deg)' }],
+      { duration: 650, easing: 'cubic-bezier(.6,0,.3,1)', fill: 'forwards' }).finished.then(function () { return toPill })
+  }
   /* an egg was found. quiet = the egg already made its own thud */
   function collect(kind, quiet) {
-    var done = bigStamp(kind); if (!quiet) setTimeout(sfx.thud, 320);
-    done.then(function (b) {
-      if (!b.n.animate) { if (b.n.parentNode) b.n.parentNode.removeChild(b.n); return }
-      b.n.animate([{ opacity: .92 }, { opacity: 0 }], { duration: 1000, easing: 'ease', fill: 'forwards' }).finished.then(function () { if (b.n.parentNode) b.n.parentNode.removeChild(b.n) })
+    if (TL.have[kind]) return; TL.have[kind] = 1;
+    var first = ++TL.total === 1, s = stampOf(kind), ix = STAMPS.indexOf(s);
+    if (!TL.root) buildLog();
+    if (first) { TL.touched = false; TL.root.hidden = false; setOpen(true); retrig(TL.root, 'pop') } /* the card opens by itself once, so you see where the stamp goes */
+    clearTimeout(TL.timer);
+    var slot = TL.root.querySelector('[data-k="' + kind + '"]'), st = el('span', 'tl-st', stampSvg(kind)); st.__rot = TLROT[ix];
+    st.style.cssText = 'color:' + s.ink + ';rotate:' + TLROT[ix] + 'deg;opacity:0'; slot.appendChild(st);
+    if (!quiet) setTimeout(sfx.thud, 320);
+    bigStamp(kind).then(function (b) { return flyStamp(b, st).then(function (toPill) { if (b.n.parentNode) b.n.parentNode.removeChild(b.n); return toPill }) }).then(function (toPill) {
+      st.style.opacity = ''; var nm = slot.parentNode.querySelector('.tl-nm'); nm.textContent = s.name; nm.classList.remove('tl-unk'); slot.classList.add('on');
+      TL.n++; var c = TL.n + '/4'; TL.root.querySelector('.tl-cnt').textContent = c; TL.pill.querySelector('.tl-pc').textContent = c;
+      TL.pill.setAttribute('aria-label', 'trail log, ' + TL.n + ' of 4 stamps'); TL.root.querySelector('.tl-sr').textContent = 'stamp collected: ' + s.name + '. ' + TL.n + ' of 4.';
+      if (toPill || !TL.open) retrig(TL.pill, 'bump'); else retrig(st, 'settle');
+      if (first && !TL.touched) TL.timer = setTimeout(function () { if (!TL.touched) setOpen(false) }, 3000) /* folds itself away after a moment unless you've touched it */
     })
   }
   function sprout(ctx, px, delay, k) { var s = 9 + Math.random() * 9, m = el('span', '', shroom()).firstChild; m.style.cssText = 'left:' + px.toFixed(0) + 'px;--s:' + s.toFixed(1) + ';--d:' + delay + 'ms;--k:' + k; ctx.mc.appendChild(m); ctx.n++ }
