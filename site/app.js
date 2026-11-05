@@ -250,8 +250,10 @@
   eggs.trail = function () {
     if (trailUndo) trailUndo();
     var T = timers(), hr = host.getBoundingClientRect(), spans = [].map.call(host.querySelectorAll('.lab>span'), function (s) { return s.getBoundingClientRect() });
-    var fx = x + W / 2; spans.forEach(function (r) { var l = r.left - hr.left, rr = r.right - hr.left; if (fx > l - 8 && fx < rr + 8) fx = (fx - l < rr - fx) ? l - 12 : rr + 12 });
+    /* plant it beside him, not under him, so spam-clicking the hiker can't hit the flag and pull it straight back up */
+    var fx = x + W / 2, side = fx + 30 > host.clientWidth - 8 ? -1 : 1; fx += side * 30; spans.forEach(function (r) { var l = r.left - hr.left, rr = r.right - hr.left; if (fx > l - 8 && fx < rr + 8) fx = (fx - l < rr - fx) ? l - 12 : rr + 12 });
     fx = Math.max(8, Math.min(host.clientWidth - 8, fx));
+    if (Math.abs(fx - (x + W / 2)) < 26) fx = Math.max(8, Math.min(host.clientWidth - 8, x + W / 2 + (fx < x + W / 2 ? 30 : -30))); /* label nudge landed back under him: use his other side */
     var flag = el('button', 'eflag', '<span class="fl">' + FLAG + '</span>'), mc = el('span', 'emush'), ctx = { mc: mc, fx: fx, hr: hr, spans: spans, n: 0 };
     flag.type = 'button'; flag.setAttribute('aria-label', 'pull up the flag'); flag.style.left = fx.toFixed(0) + 'px';
     host.appendChild(flag); host.appendChild(mc); sfx.pip();
