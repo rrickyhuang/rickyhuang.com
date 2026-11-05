@@ -29,13 +29,14 @@
   var tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
   /* egg hints (lines.js: hints.<egg>): about 1 in 5 taps (day or night), drawn only from eggs that have not been stamped yet. keys match the egg names (trail, fog, night, rain). */
-  var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = [], lastHint = '';
+  var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = {}, lastHint = '', lastEgg = '';
+  /* picks an unfound egg first (never the same one twice running if another is open), then a line from that egg's own shuffled queue, so every egg gets equal airtime however many lines it has */
   function nextHint() {
-    var open = []; Object.keys(HINTS).forEach(function (k) { if (!TL.have[k] && HINTS[k]) HINTS[k].forEach(function (t) { open.push(t) }) });
+    var open = Object.keys(HINTS).filter(function (k) { return !TL.have[k] && HINTS[k] && HINTS[k].length });
     if (!open.length) return null;
-    hintQ = hintQ.filter(function (t) { return open.indexOf(t) > -1 }); /* drop hints whose egg was just found */
-    if (!hintQ.length) { hintQ = shuffle(open.slice()); if (hintQ.length > 1 && hintQ[hintQ.length - 1] === lastHint) { var f = hintQ[0]; hintQ[0] = hintQ[hintQ.length - 1]; hintQ[hintQ.length - 1] = f } }
-    lastHint = hintQ.pop(); return lastHint
+    var pool = open.length > 1 ? open.filter(function (k) { return k !== lastEgg }) : open, k = pool[Math.floor(Math.random() * pool.length)], q = hintQ[k];
+    if (!q || !q.length) { q = hintQ[k] = shuffle(HINTS[k].slice()); if (q.length > 1 && q[q.length - 1] === lastHint) { var f = q[0]; q[0] = q[q.length - 1]; q[q.length - 1] = f } }
+    lastEgg = k; lastHint = q.pop(); return lastHint
   }
   function nextNight() { if (!nightQ.length) nightQ = shuffle(NIGHT.slice()); return nightQ.pop() }
   function nextCap() { if (!capQ.length) { capQ = shuffle(PLINES.slice()); if (capQ[capQ.length - 1] === lastCap) { var f = capQ[0]; capQ[0] = capQ[capQ.length - 1]; capQ[capQ.length - 1] = f } } lastCap = capQ.pop(); return lastCap }

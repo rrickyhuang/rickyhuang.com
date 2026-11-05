@@ -49,7 +49,7 @@ window.HIKER_LINES = {
 		"you seem familiar."
 	],
 	/* hints toward the easter eggs, keyed by egg (trail, fog, night, rain). about 1 in 5 taps shows one,
-	   picked only from eggs not yet stamped in the trail log, so a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
+	   an unstamped egg is picked first, then one of its lines, so every egg gets equal airtime however many lines it has; a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
 	hints: {
 		trail: [
 			"lets move mountains.",
