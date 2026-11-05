@@ -1,8 +1,8 @@
-# Copy to .github/workflows/deploy.yml in the site repo.
-# Repo settings: Pages -> Source: "GitHub Actions". Site files live in site/.
-# Every push AND once a day it refreshes site/film.json from Letterboxd, then publishes.
-# (Commits made by an Action's GITHUB_TOKEN do not trigger a Pages build, so film.json is
-#  generated at deploy time instead of being committed.)
+# Publishes site/ to GitHub Pages on every push to main, once a day, and on demand.
+# Repo settings: Pages -> Source: "GitHub Actions".
+# Before publishing it refreshes site/film.json from Letterboxd; if that fails, the copy
+# committed in the repo is published instead. The refreshed file is published, not committed
+# back (commits made by an Action's GITHUB_TOKEN do not trigger a Pages build).
 name: Deploy site
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
   id-token: write
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false   # let a running production deploy finish; queued runs collapse to the latest
 jobs:
   deploy:
     runs-on: ubuntu-latest
