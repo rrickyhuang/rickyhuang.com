@@ -1,7 +1,7 @@
 (function () {
   var hk = document.querySelector('.hdr .hk'); if (!hk) return;
   var host = hk.parentNode, W = 15;
-  var legL = hk.querySelector('.legL'), legR = hk.querySelector('.legR'), pole = hk.querySelector('.pole'), bodyg = hk.querySelector('.bodyg'),
+  var poseParts = Hiker.parts(hk), shuffle = Hiker.shuffle, words = Hiker.words, pickVar = Hiker.pickVar, /* shared with 404.html: hiker.js */
     say = hk.querySelector('.say'), hit = hk.querySelector('.hit');
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   /* must match the `@media (max-width:760px)` blocks in styles.css (the single-column layout) */
@@ -26,14 +26,11 @@
     return '<div class="fm">' + words(lead) + ' <a target="_blank" rel="noopener" href="' + esc(f.url) + '">' + esc(f.title) + '</a><small>' + meta + '</small></div>'
   }
   var capQ = [], lastCap = '';
-  var VARS = ['pop', 'bump', 'wiggle', 'drop', 'swing'], lastVar = '', tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
-  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t } return a }
+  var tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
   function nextNight() { if (!nightQ.length) nightQ = shuffle(NIGHT.slice()); return nightQ.pop() }
   function nextCap() { if (!capQ.length) { capQ = shuffle(PLINES.slice()); if (capQ[capQ.length - 1] === lastCap) { var f = capQ[0]; capQ[0] = capQ[capQ.length - 1]; capQ[capQ.length - 1] = f } } lastCap = capQ.pop(); return lastCap }
   function nextPhoto() { if (!photoQ.length) photoQ = shuffle(PHOTOS.slice()); return photoQ.pop() }
-  function pickVar() { var q; do { q = VARS[Math.floor(Math.random() * VARS.length)] } while (q === lastVar); lastVar = q; return q }
-  function words(t) { return t.split(' ').map(function (w, i) { return '<span class="w" style="--i:' + i + '">' + w + '</span>' }).join(' ') }
   /* 84 = room kept clear at the right end of the header for the fern (.pr .hdr .bough in styles.css: 70px wide + right:.2rem + a little air); it is display:none in the narrow layout, so nothing is reserved there */
   function hw() { return Math.max(0, host.clientWidth - W - (narrow.matches ? 0 : 84)) }
   function clamp(a, lo, hi) { return Math.max(lo, Math.min(hi, a)) }
@@ -339,13 +336,7 @@
   addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (lbOpen) closeLB(); else hide() } });
   say.addEventListener('mouseenter', function () { if (!lbOpen) clearTimeout(hideT) });
   say.addEventListener('mouseleave', function () { if (hk.classList.contains('talk') && !lbOpen) arm(1400) });
-  function pose(amp) {
-    var s = Math.sin(phase) * 28 * amp, b = Math.abs(Math.sin(phase)) * 1.3 * amp, lean = Math.min(1, Math.abs(v) / VMAX_CHASE) * 5;
-    legL.setAttribute('transform', 'rotate(' + s.toFixed(1) + ' 11 22)');
-    legR.setAttribute('transform', 'rotate(' + (-s).toFixed(1) + ' 11 22)');
-    pole.setAttribute('transform', 'rotate(' + (-s * .35).toFixed(1) + ' 18.5 17)');
-    bodyg.setAttribute('transform', 'translate(0 ' + (-b).toFixed(2) + ') rotate(' + lean.toFixed(1) + ' 11 38)')
-  }
+  function pose(amp) { Hiker.pose(poseParts, phase, amp, Math.min(1, Math.abs(v) / VMAX_CHASE) * 5) }
   function frame(t) {
     var dt = Math.min(.05, (t - prev) / 1000); prev = t;
     var following = mouseX !== null && t - lastMove < 5000;
