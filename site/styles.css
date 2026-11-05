@@ -725,7 +725,11 @@ li:hover .walker {
 	color: var(--ink);
 	font: 400 1.3rem/1 "Young Serif", serif;
 	cursor: pointer;
-	display: none
+	opacity: 0
+}
+
+.lb-x:focus-visible {
+	opacity: 1
 }
 
 .horn {

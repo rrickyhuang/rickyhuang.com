@@ -310,9 +310,9 @@
   var lb = null;
   function ensureLB() {
     if (lb) return lb; lb = document.createElement('div'); lb.className = 'lb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'photo');
-    lb.innerHTML = '<div class="lb-bg"></div><figure class="lb-card"><span class="tape"></span><img alt=""><figcaption><span class="t"></span><span class="m"></span></figcaption></figure><span class="lb-hint">tap anywhere to close</span>';
+    lb.innerHTML = '<div class="lb-bg"></div><figure class="lb-card"><span class="tape"></span><img alt=""><figcaption><span class="t"></span><span class="m"></span></figcaption></figure><span class="lb-hint">tap anywhere to close</span><button class="lb-x" type="button" aria-label="close photo">&times;</button>';
     document.body.appendChild(lb);
-    lb.querySelector('.lb-bg').addEventListener('click', closeLB); lb.querySelector('.lb-card').addEventListener('click', closeLB); return lb
+    lb.querySelector('.lb-bg').addEventListener('click', closeLB); lb.querySelector('.lb-card').addEventListener('click', closeLB); lb.querySelector('.lb-x').addEventListener('click', closeLB); return lb
   }
   function collapsed(card) {
     var tr = lastThumb.getBoundingClientRect(), cr = card.getBoundingClientRect();
@@ -322,6 +322,8 @@
     lbOpen = true; lastThumb = thumb; clearTimeout(hideT); var el = ensureLB(), card = el.querySelector('.lb-card');
     card.style.setProperty('--r', ph.ratio || 1.3333); el.querySelector('img').src = ph.src; el.querySelector('.t').textContent = ph.title; el.querySelector('.m').innerHTML = ph.meta.join('<br>');
     el.classList.remove('closing'); el.classList.add('open');
+    /* modal: park the page behind it (inert also keeps Tab inside) and put focus on the close button, which is only drawn while it has keyboard focus */
+    var stage = document.querySelector('.stage'); if (stage) stage.inert = true; try { el.querySelector('.lb-x').focus({ preventScroll: true }) } catch (e) { }
     card.style.transition = 'none'; card.style.transform = 'none';
     var start = collapsed(card); card.style.transform = start; void card.offsetWidth;
     card.style.transition = reduce ? 'none' : 'transform .6s cubic-bezier(.3,1.3,.5,1)';
@@ -330,7 +332,7 @@
   function closeLB() {
     if (!lbOpen) return; var card = lb.querySelector('.lb-card');
     card.style.transition = reduce ? 'none' : 'transform .34s cubic-bezier(.5,0,.8,.4)'; card.style.transform = collapsed(card); lb.classList.add('closing');
-    setTimeout(function () { lb.classList.remove('open', 'closing'); lbOpen = false; arm(900); try { hit.focus({ preventScroll: true }) } catch (e) { } }, reduce ? 0 : 350)
+    setTimeout(function () { lb.classList.remove('open', 'closing'); lbOpen = false; var stage = document.querySelector('.stage'); if (stage) stage.inert = false; arm(900); try { hit.focus({ preventScroll: true }) } catch (e) { } }, reduce ? 0 : 350)
   }
   hit.addEventListener('click', function (e) { e.stopPropagation(); show() });
   document.addEventListener('click', function (e) { if (!hk.contains(e.target) && !(e.target.closest && e.target.closest('.nite'))) hide() });
