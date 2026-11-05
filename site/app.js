@@ -298,9 +298,13 @@
   eggs.night = function () {
     if (nightEnd) return;
     unlockNight();
-    var T = timers(), d = el('div', 'edark'), f = el('div', 'eff'), g2 = el('div', 'eff efa'), layers = [f, g2], ffs = [], fw = 0, FH = 0, i, beam = el('i', 'ebeam'), lamp = el('i', 'elamp'), glows = [], alive = true, raf = 0, cr = null, lastG = performance.now() / 1000, nextMote = 0;
-    for (i = 0; i < 10; i++) { var ff = el('i', 'ff'); ff.style.cssText = 'left:' + (Math.random() * 96 + 2).toFixed(0) + '%;top:0;--dx:' + ((Math.random() * 80 - 40) | 0) + 'px;--dy:' + ((Math.random() * 60 - 30) | 0) + 'px;--t:' + (5 + Math.random() * 5).toFixed(1) + 's;--w:' + (1.6 + Math.random() * 2.4).toFixed(1) + 's;animation-delay:' + (-Math.random() * 6).toFixed(1) + 's,' + (-Math.random() * 3).toFixed(1) + 's'; ff.__b = Math.random(); ffs.push(ff); f.appendChild(ff) }
-    f.appendChild(beam); f.appendChild(lamp);
+    var T = timers(), d = el('div', 'edark'), g2 = el('div', 'eff efa'), layers = [g2], ffs = [], fw = 0, fvh = 0, fdh = 0, ro = null, i, beam = el('i', 'ebeam'), lamp = el('i', 'elamp'), glows = [], alive = true, raf = 0, cr = null, lastG = performance.now() / 1000, nextMote = 0;
+    for (i = 0; i < 40; i++) { var ff = el('i', 'ff'); ff.style.cssText = 'left:' + (Math.random() * 96 + 2).toFixed(0) + '%;top:0;--dx:' + ((Math.random() * 80 - 40) | 0) + 'px;--dy:' + ((Math.random() * 60 - 30) | 0) + 'px;--t:' + (5 + Math.random() * 5).toFixed(1) + 's;--w:' + (1.6 + Math.random() * 2.4).toFixed(1) + 's;animation-delay:' + (-Math.random() * 6).toFixed(1) + 's,' + (-Math.random() * 3).toFixed(1) + 's'; ff.__b = Math.random(); ffs.push(ff); g2.appendChild(ff) }
+    /* fireflies live in document space (native scroll) and are spread over the whole page height */
+    /* only re-layout when the width or the page height changes: mobile toolbars resize innerHeight while scrolling, which would make the fireflies jump */
+    function layoutFF() { var dh = Math.max(document.documentElement.scrollHeight, innerHeight); if (innerWidth !== fw) { fw = innerWidth; fvh = innerHeight } else if (dh === fdh) return; fdh = dh; var n = Math.min(ffs.length, Math.max(8, Math.round(dh / fvh * 8))); for (var k = 0; k < ffs.length; k++) { ffs[k].style.top = (ffs[k].__b * dh).toFixed(0) + 'px'; ffs[k].style.display = k < n ? '' : 'none' } }
+    layoutFF(); addEventListener('resize', layoutFF); if (window.ResizeObserver) { ro = new ResizeObserver(layoutFF); ro.observe(document.body) }
+    g2.appendChild(beam); g2.appendChild(lamp);
     /* toggled back on while the last night is still fading out: take over from its current opacity (so no flash, and never two layers) */
     var od = reclaim('.edark.out'), oe = reclaim('.eff.out'); document.body.appendChild(d); layers.forEach(function (l) { document.body.appendChild(l) }); nightEl = d; nmSync();
     if (od) d.style.cssText += ';transition:none;opacity:' + od; if (oe) layers.forEach(function (l) { l.style.cssText += ';transition:none;opacity:' + oe });
@@ -311,18 +315,14 @@
       var px = lastPX < 0 ? hx + dd * 90 : lastPX, py = lastPY < 0 ? hy + 90 : lastPY, lx = r.left + r.width * (dd > 0 ? .64 : .36), ly = r.top + r.height * .15;
       d.style.setProperty('--px', px.toFixed(0) + 'px'); d.style.setProperty('--py', py.toFixed(0) + 'px');
       d.style.setProperty('--hx', hx.toFixed(0) + 'px'); d.style.setProperty('--hy', hy.toFixed(0) + 'px');
-      beam.style.transform = 'translate(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px) scaleX(' + dd.toFixed(2) + ')';
-      lamp.style.transform = 'translate(' + (lx - 2).toFixed(1) + 'px,' + (ly - 2).toFixed(1) + 'px)';
+      beam.style.transform = 'translate(' + (lx + scrollX).toFixed(1) + 'px,' + (ly + scrollY).toFixed(1) + 'px) scaleX(' + dd.toFixed(2) + ')';
+      lamp.style.transform = 'translate(' + (lx - 2 + scrollX).toFixed(1) + 'px,' + (ly - 2 + scrollY).toFixed(1) + 'px)';
       /* mushrooms (trail egg + link bullets) glow in the dark. real foxfire: gills brightest, cap dim, stem dark; each one a little different. */
       var ems = [].slice.call(document.querySelectorAll('.emush:not(.out) .em,.links .m')), tt = performance.now() / 1000, dtg = Math.min(.1, tt - lastG); lastG = tt;
       if (nmM) ems.unshift(nmM); /* always index 0, so its glow slot never shifts when trail mushrooms come and go */
       var fe = document.querySelector('.efog:not(.out)'), fg = fe ? (parseFloat(getComputedStyle(fe).opacity) || 0) : 0;
       /* read every rect first, then write: interleaving them forces a layout per mushroom per frame */
       var rects = ems.map(function (e) { return e.getBoundingClientRect() }), sx = scrollX, sy = scrollY;
-      /* fireflies drift with the page (wrapping around the viewport) instead of being pinned to the screen. __b is a 0-1 fraction of the wrap height.
-         FH only follows width changes: mobile toolbars resize the height while scrolling, which would make them jump. */
-      if (innerWidth !== fw) { fw = innerWidth; FH = innerHeight + 160 }
-      for (var fi = 0; fi < ffs.length; fi++) ffs[fi].style.transform = 'translateY(' + (((ffs[fi].__b * FH - sy * .9) % FH + FH) % FH - 80).toFixed(1) + 'px)';
       while (glows.length < ems.length) {
         var sp = ems[glows.length] === nmM, g = el('i', 'eg' + (sp ? ' sp' : ''), GLOWSVG + '<b class="h2"></b><b class="h1"></b><b class="gr"></b>'), hue = sp ? SPHUE : 140 + Math.random() * 36;
         g.style.setProperty('--hue', hue.toFixed(0)); if (!sp && ems[glows.length].closest && ems[glows.length].closest('.links')) g.className += ' bl'; g.__p = { b: sp ? .95 : .5 + Math.random() * .5, per: 3 + Math.random() * 4.5, ph: Math.random() * 6.28, fl: 0, nf: tt + 3 + Math.random() * 10 }; g2.appendChild(g); glows.push(g)
@@ -334,7 +334,7 @@
         if (tt > p.nf) { p.fl = 1; p.nf = tt + 5 + Math.random() * 12 } p.fl = Math.max(0, p.fl - dtg * 2.2);
         var s = Math.sin(tt / p.per * 6.283 + p.ph), pu = .74 + .26 * (s * s * (s < 0 ? .6 : 1) + .2), sz = Math.min(1.25, Math.max(.6, q.width / 16)),
           b = Math.min(1, p.b * sz * pu * (1 - .5 * p.fl)), gs = gl.style;
-        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + (q.left + sx).toFixed(1) + 'px,' + (q.top + sy).toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3));
+        gs.width = q.width.toFixed(1) + 'px'; gs.height = q.height.toFixed(1) + 'px'; gs.transform = 'translate(' + (q.left + sx).toFixed(1) + 'px,' + (q.top + sy).toFixed(1) + 'px)'; gs.opacity = lv.toFixed(3); gs.setProperty('--b', b.toFixed(3)); gs.setProperty('--fg', fg.toFixed(3));
         if (lv > .35 && tt > nextMote && q.width > 6 && Math.random() < .35) { nextMote = tt + 1.4 + Math.random() * 2.6; var m = el('i', 'mote'); m.style.cssText = 'left:' + (mx + sx + (Math.random() * 8 - 4)).toFixed(0) + 'px;top:' + (q.top + sy + q.height * .3).toFixed(0) + 'px;--hue:' + gl.style.getPropertyValue('--hue'); g2.appendChild(m); setTimeout(function (n) { return function () { if (n.parentNode) n.parentNode.removeChild(n) } }(m), 5200) }
       }
       raf = requestAnimationFrame(loop)
@@ -344,7 +344,7 @@
     cr = setInterval(function () { if (rainEnd || !snd.on) return; var n = 3 + ((Math.random() * 3) | 0); for (var k = 0; k < n; k++)tone(4300, 4300, .05, .008, 'sine', k * .075) }, 2200);
     T.at(function () { speak(words(rainEnd ? 'rainy night. cozy.' : 'getting dark. good thing i packed a headlamp.'), 5200) }, 450);
     T.at(function () { collect('night') }, 1500); /* stamped at sunset, as the light goes */
-    nightEnd = function () { alive = false; T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); layers.forEach(function (l) { gone(l, 1800) }) }
+    nightEnd = function () { alive = false; removeEventListener('resize', layoutFF); if (ro) ro.disconnect(); T.clear(); clearInterval(cr); cancelAnimationFrame(raf); nightEl = null; nmSync(); sfx.lights(); gone(d, 1800); layers.forEach(function (l) { gone(l, 1800) }) }
   };
   /* the odd mushroom in the about section: inert until night has happened once (remembered), then the day/night toggle.
      it glows violet, the others green. */

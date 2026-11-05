@@ -1714,6 +1714,9 @@ body:has(.edark:not(.out)) .tlog {
 	pointer-events: none;
 	opacity: 0;
 	transition: opacity 1.8s ease;
+	bottom: auto;
+	height: 100vh;
+	height: 100lvh; /* cover the full large viewport so the day colours never peek out while the mobile URL bar collapses */
 	background: rgba(6, 15, 27, .84);
 	-webkit-mask-image: radial-gradient(circle at var(--px, 50%) var(--py, 50%), transparent 0, transparent 2.6rem, rgba(0, 0, 0, .5) 6.5rem, #000 11.5rem), radial-gradient(circle at var(--hx, 50%) var(--hy, 50%), transparent 0, transparent 7rem, rgba(0, 0, 0, .5) 10.5rem, #000 15rem);
 	-webkit-mask-composite: source-in;
