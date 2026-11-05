@@ -7,9 +7,7 @@ window.HIKER_LINES = {
 		"take the long way round.",
 		"look up.",
 		"take a seat.",
-		"is it raining?",
 		"pace yourself.",
-		"psst. the fern is ticklish.",
 		"hey, that tickles.",
 		"take a picture, itll last longer!",
 		"snack break? i always pack too many.",
@@ -17,7 +15,6 @@ window.HIKER_LINES = {
 		"its not an adventure if you know where youre going.",
 		"so much life.",
 		"whats around the corner?",
-		"look how far youve come!",
 		"one step at a time.",
 		"what a beautiful day!",
 		"wait a moment.",
@@ -40,7 +37,6 @@ window.HIKER_LINES = {
 		"i wish i was a bird.",
 		"things are looking up.",
 		"change is good.",
-		"lets move a mountain.",
 		"it doesnt get better than this!",
 		"are you scared?",
 		"youre so brave!",
@@ -53,16 +49,17 @@ window.HIKER_LINES = {
 		"life happens wherever you are, whether you make it or not.",
 		"hows it going?",
 		"i like when its quiet.",
-		"you seem familiar.",
-		"those mushrooms look delicious!",
-		"check out those mushrooms!"
+		"you seem familiar."
 	],
 	/* hints toward the easter eggs, keyed by egg (trail, fog, night, rain). about 1 in 5 daytime taps shows one,
 	   picked only from eggs not yet stamped in the trail log, so a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
 	hints: {
 		trail: [
+			"lets move a mountain.",
+			"look how far youve come!"
 		],
 		fog: [
+			"psst. the fern is ticklish.",
 			"plants have feelings too.",
 			"the plants are alive!",
 			"sometimes its nice to talk to a plant."
@@ -71,6 +68,7 @@ window.HIKER_LINES = {
 			"i hear some mushrooms glow in the dark.",
 			"my dream job is a mushroom whisperer.",
 			"those mushrooms look delicious!",
+			"check out those mushrooms!"
 		],
 		rain: [
 			"stay long enough and the weather turns.",
@@ -78,7 +76,8 @@ window.HIKER_LINES = {
 			"i feel like its gonna rain.",
 			"i think it might rain.",
 			"be patient. the weather changes.",
-			"stay a while."
+			"stay a while.",
+			"is it raining?"
 		]
 	},
 	/* same, but only while it is night */
