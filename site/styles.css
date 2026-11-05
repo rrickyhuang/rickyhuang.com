@@ -1111,19 +1111,21 @@ li:hover .horn path:nth-child(3) {
 }
 
 /* sound toggle */
+/* lives at the right end of the left panel's header rule (.pl .hdr .lab), opposite the site name; the label row ignores
+   pointer events, so the button turns them back on. negative margins keep it from making the header row taller */
 .snd {
-	position: absolute;
-	right: calc(var(--m) - .45rem);
-	bottom: calc(var(--m) - .4rem);
-	z-index: 2;
+	flex: none;
+	align-self: center;
+	margin: -.5rem -.45rem -.5rem 0;
+	pointer-events: auto;
 	width: 2.2rem;
 	height: 2.2rem;
 	padding: .45rem;
-	color: var(--sec);
+	color: var(--bg);
 	background: none;
 	border: 0;
 	cursor: pointer;
-	opacity: .7;
+	opacity: .8;
 	-webkit-tap-highlight-color: transparent
 }
 
@@ -1145,6 +1147,277 @@ li:hover .horn path:nth-child(3) {
 .snd[aria-pressed=true] .w-off,
 .snd[aria-pressed=false] .w-on {
 	display: none
+}
+
+/* trail log: a pocket book of the egg stamps found so far. in memory only, so it clears when you leave or refresh */
+.tlog {
+	position: fixed;
+	right: 1rem;
+	bottom: max(1rem, env(safe-area-inset-bottom));
+	z-index: 5;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: .5rem;
+	color: var(--ink);
+	transition: filter .9s ease
+}
+
+.tlog[hidden] {
+	display: none
+}
+
+/* at night the log sits under the dark layer (z-index 3), like the other things in the world, so only the flashlight and the hiker's lamp light it up */
+body:has(.edark:not(.out)) .tlog {
+	z-index: 2
+}
+
+.tlog.pop {
+	animation: tlpop .4s ease both
+}
+
+.tl-card {
+	width: min(17rem, calc(100vw - 2rem));
+	background: #F1F1E1;
+	border: 1.5px solid var(--ink);
+	padding: .6rem .7rem .7rem;
+	box-shadow: 3px 3px 0 var(--deep);
+	rotate: .8deg
+}
+
+.tlog:not(.open) .tl-card {
+	display: none
+}
+
+.tl-card h4 {
+	margin: 0 0 .5rem;
+	font: 400 .95rem/1.2 'Young Serif', Georgia, serif;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline
+}
+
+.tl-cnt {
+	font: 600 .65rem 'Instrument Sans', sans-serif;
+	letter-spacing: .14em;
+	font-style: normal;
+	color: var(--acc)
+}
+
+/* two fixed columns: the card never changes width when a "?" becomes a name */
+.tl-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: .55rem .6rem
+}
+
+.tl-cell {
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+	min-width: 0
+}
+
+.tl-slot {
+	position: relative;
+	flex: none;
+	width: 2.5rem;
+	height: 2.5rem
+}
+
+.tl-gh {
+	position: absolute;
+	inset: 0;
+	opacity: .3
+}
+
+.tl-slot.on .tl-gh,
+.tl-slot.on .tl-q {
+	display: none
+}
+
+.tl-gh svg,
+.tl-st svg {
+	display: block;
+	width: 100%;
+	height: 100%
+}
+
+.tl-q {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	font: 400 1rem 'Young Serif', Georgia, serif;
+	opacity: .45
+}
+
+.tl-st {
+	position: absolute;
+	inset: 0;
+	mix-blend-mode: multiply
+}
+
+.tl-nm {
+	font: 600 .68rem/1.2 'Instrument Sans', sans-serif;
+	letter-spacing: .03em;
+	min-width: 0
+}
+
+.tl-nm.tl-unk {
+	font: 400 .95rem 'Young Serif', Georgia, serif;
+	opacity: .5
+}
+
+.tl-grid {
+	position: relative
+}
+
+/* all four: a rubber stamp across the card, and the pill turns rust */
+.tl-over {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	translate: -50% -50%;
+	rotate: -11deg;
+	padding: .05rem .5rem;
+	border: 3px double var(--acc);
+	color: var(--acc);
+	font: 400 .9rem 'Young Serif', Georgia, serif;
+	white-space: nowrap;
+	mix-blend-mode: multiply;
+	pointer-events: none;
+	animation: tlthump .5s cubic-bezier(.55, 0, .9, .45) both
+}
+
+.tlog.full .tl-pill {
+	background: var(--acc);
+	box-shadow: 2px 2px 0 var(--deep)
+}
+
+@keyframes tlthump {
+	0% {
+		opacity: 0;
+		scale: 2.2
+	}
+
+	62% {
+		opacity: .95;
+		scale: .95
+	}
+
+	80% {
+		scale: 1.04
+	}
+
+	100% {
+		opacity: .92;
+		scale: 1
+	}
+}
+
+.tl-pill {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: .45rem;
+	padding: .5rem .75rem;
+	border: 0;
+	background: var(--deep);
+	color: var(--bg);
+	font: 600 .7rem 'Instrument Sans', sans-serif;
+	letter-spacing: .1em;
+	text-transform: uppercase;
+	cursor: pointer;
+	box-shadow: 2px 2px 0 var(--acc)
+}
+
+.tl-pill:focus-visible {
+	outline: 2px solid var(--acc);
+	outline-offset: 3px
+}
+
+.tl-pill::after {
+	content: "";
+	position: absolute;
+	inset: -2px;
+	border: 2px solid var(--acc);
+	opacity: 0;
+	pointer-events: none
+}
+
+.tl-pill.bump {
+	animation: tlbump .45s ease
+}
+
+.tl-pill.bump::after {
+	animation: tlring .6s ease-out
+}
+
+.tl-st.settle {
+	animation: tlsettle .3s ease
+}
+
+.tl-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap
+}
+
+@keyframes tlpop {
+	from {
+		opacity: 0
+	}
+
+	to {
+		opacity: 1
+	}
+}
+
+@keyframes tlbump {
+	35% {
+		scale: 1.3
+	}
+}
+
+@keyframes tlring {
+	from {
+		opacity: .9;
+		scale: 1
+	}
+
+	to {
+		opacity: 0;
+		scale: 1.45
+	}
+}
+
+@keyframes tlsettle {
+	0% {
+		scale: 1.25
+	}
+
+	60% {
+		scale: .94
+	}
+
+	100% {
+		scale: 1
+	}
+}
+
+@media (max-width: 760px) {
+	.tl-slot {
+		width: 2.2rem;
+		height: 2.2rem
+	}
+
+	.tl-nm {
+		font-size: .64rem
+	}
 }
 
 /* trail: flag stays planted on the line until clicked */
@@ -1227,80 +1500,30 @@ li:hover .horn path:nth-child(3) {
 	}
 }
 
-.estamp {
-	position: absolute;
-	width: min(68vw, 15rem);
-	aspect-ratio: 1;
-	margin: calc(min(68vw, 15rem)/-2) 0 0 calc(min(68vw, 15rem)/-2);
-	z-index: 2;
+/* egg stamps: the big one that thumps down when an egg is found */
+.bstamp {
+	position: fixed;
+	z-index: 6;
 	pointer-events: none;
 	color: var(--acc);
 	mix-blend-mode: multiply;
-	opacity: 0;
-	rotate: -9deg;
-	animation: estamp .52s cubic-bezier(.55, 0, .9, .45) .45s both
+	opacity: 0
 }
 
-.estamp svg {
+.bstamp svg {
 	display: block;
 	width: 100%;
 	height: 100%
 }
 
-.estamp.fade {
-	animation: efadeout 1s ease forwards
+/* over the dark hero or the night layer, ink can't multiply: print it pale instead */
+.bstamp.ondark {
+	mix-blend-mode: normal;
+	color: #EDB9A0 !important
 }
 
-.estamp.out {
-	animation: efadeout .5s ease forwards
-}
-
-@keyframes efadeout {
-	from {
-		opacity: .92;
-		scale: 1;
-		rotate: -9deg
-	}
-
-	to {
-		opacity: 0;
-		scale: 1;
-		rotate: -9deg
-	}
-}
-
-@keyframes estamp {
-	0% {
-		opacity: 0;
-		scale: 2.1;
-		rotate: -2deg
-	}
-
-	62% {
-		opacity: .95;
-		scale: .95;
-		rotate: -11deg
-	}
-
-	80% {
-		scale: 1.03
-	}
-
-	100% {
-		opacity: .92;
-		scale: 1;
-		rotate: -9deg
-	}
-}
-
-.emush {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 0;
-	z-index: 1;
-	pointer-events: none
+.bstamp.night.ondark {
+	color: #E4E6C8 !important
 }
 
 .em {
@@ -1753,22 +1976,6 @@ li:hover .horn path:nth-child(3) {
 }
 
 @media (max-width:760px) {
-	.snd {
-		position: static;
-		align-self: flex-end;
-		margin: 1rem -.45rem 0 0
-	}
-
-	.estamp {
-		width: min(60vw, 12rem);
-		margin: calc(min(60vw, 12rem)/-2) 0 0 calc(min(60vw, 12rem)/-2)
-	}
-
-	.estamp.ondark {
-		mix-blend-mode: normal;
-		color: #EDB9A0
-	}
-
 	.eggbar span {
 		display: none
 	}
@@ -1781,7 +1988,11 @@ li:hover .horn path:nth-child(3) {
 @media (prefers-reduced-motion:reduce) {
 
 	.em,
-	.estamp,
+	.tlog,
+	.tl-pill,
+	.tl-pill::after,
+	.tl-st,
+	.tl-over,
 	.eflag .fl,
 	.eflag .cl,
 	.eumb {
