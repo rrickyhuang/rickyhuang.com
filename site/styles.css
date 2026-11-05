@@ -69,16 +69,6 @@ a {
 	border-radius: 2px
 }
 
-.paper {
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	z-index: 40;
-	background: url(assets/paper-texture.jpg) 0 0/512px 512px;
-	mix-blend-mode: multiply;
-	opacity: 0
-}
-
 .lab {
 	display: flex;
 	justify-content: space-between;
@@ -87,28 +77,6 @@ a {
 	font: 600 .68rem/1 "Instrument Sans", sans-serif;
 	letter-spacing: .16em;
 	text-transform: uppercase
-}
-
-.rule {
-	margin-top: 1rem;
-	position: relative
-}
-
-.rule.hairline {
-	border-top: 1px solid color-mix(in srgb, var(--ink) 38%, transparent)
-}
-
-.rule.double {
-	height: 5px;
-	border-top: 1px solid color-mix(in srgb, var(--ink) 55%, transparent);
-	border-bottom: 1px solid color-mix(in srgb, var(--ink) 55%, transparent)
-}
-
-.rule.ticks {
-	height: 10px;
-	border-top: 1px solid color-mix(in srgb, var(--ink) 55%, transparent);
-	background: repeating-linear-gradient(to right, color-mix(in srgb, var(--ink) 55%, transparent) 0 1px, transparent 1px 10px) 0 0/100% 5px no-repeat,
-		repeating-linear-gradient(to right, color-mix(in srgb, var(--ink) 55%, transparent) 0 1px, transparent 1px 50px) 0 0/100% 10px no-repeat
 }
 
 h1 {
@@ -200,10 +168,6 @@ li:hover .walker {
 
 :root {
 	--u: 1.2rem
-}
-
-.paper {
-	display: none
 }
 
 .hdr {
@@ -730,44 +694,6 @@ li:hover .walker {
 
 .lb-x:focus-visible {
 	opacity: 1
-}
-
-.horn {
-	color: var(--acc);
-	margin-left: .15rem;
-	flex: none
-}
-
-.horn path {
-	opacity: 0
-}
-
-li:hover .horn path {
-	animation: blast 1s ease-out both
-}
-
-li:hover .horn path:nth-child(2) {
-	animation-delay: .12s
-}
-
-li:hover .horn path:nth-child(3) {
-	animation-delay: .24s
-}
-
-@keyframes blast {
-	0% {
-		opacity: 0;
-		transform: translateX(-4px)
-	}
-
-	30% {
-		opacity: 1
-	}
-
-	100% {
-		opacity: 0;
-		transform: translateX(4px)
-	}
 }
 
 .bough {
