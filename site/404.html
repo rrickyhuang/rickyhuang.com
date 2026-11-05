@@ -7,14 +7,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 "Instrumen
 -webkit-font-smoothing:antialiased;position:relative;min-height:100svh;overflow-x:hidden}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:2px}
-.paper{position:absolute;inset:0;pointer-events:none;z-index:40;background:url(/assets/paper-texture.jpg) 0 0/512px 512px;mix-blend-mode:multiply;opacity:0}
 .lab{display:flex;justify-content:space-between;gap:.4rem 1rem;flex-wrap:wrap;font:600 .68rem/1 "Instrument Sans",sans-serif;letter-spacing:.16em;text-transform:uppercase}
-.rule{margin-top:1rem;position:relative}
-.rule.hairline{border-top:1px solid color-mix(in srgb,var(--ink) 38%,transparent)}
-.rule.double{height:5px;border-top:1px solid color-mix(in srgb,var(--ink) 55%,transparent);border-bottom:1px solid color-mix(in srgb,var(--ink) 55%,transparent)}
-.rule.ticks{height:10px;border-top:1px solid color-mix(in srgb,var(--ink) 55%,transparent);
-background:repeating-linear-gradient(to right,color-mix(in srgb,var(--ink) 55%,transparent) 0 1px,transparent 1px 10px) 0 0/100% 5px no-repeat,
-repeating-linear-gradient(to right,color-mix(in srgb,var(--ink) 55%,transparent) 0 1px,transparent 1px 50px) 0 0/100% 10px no-repeat}
 h1{font:400 clamp(3.1rem,7vw,6.2rem)/.92 "Young Serif",Georgia,serif;margin:0;letter-spacing:-.01em}
 .bio{max-width:34ch;margin:0}
 .group{margin:0 0 1.7rem}
@@ -31,7 +24,6 @@ li:hover .walker{transform:translateX(10px)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 :root{--u:1.2rem}
-.paper{display:none}
 .hdr{position:relative;border-bottom:1px solid color-mix(in srgb,var(--ink) 42%,transparent)}
 .hdr.double{border-bottom:6px double color-mix(in srgb,var(--ink) 58%,transparent)}
 .hdr .lab{padding-bottom:.4rem;line-height:1;position:relative;z-index:1;pointer-events:none}
@@ -63,44 +55,7 @@ border:1.5px solid var(--ink);border-top:0;border-left:0;transform:translate(-50
 .say .w{display:inline-block;animation:wordIn .3s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i)*40ms + 140ms)}
 @keyframes wordIn{from{opacity:0;transform:translateY(7px) scale(.9)}to{opacity:1;transform:none}}
 .say a{color:inherit;text-decoration:underline;text-decoration-color:var(--acc);text-decoration-thickness:2px;text-underline-offset:3px}
-.say .pm{display:flex;align-items:center;gap:.75rem}
-.say .pm>span{display:block}
-.say .pm small{display:block;margin-top:.3rem;font:600 .6rem/1.2 "Instrument Sans",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--sec)}
-.say .fm small{display:block;margin-top:.35rem;font:600 .6rem/1.3 "Instrument Sans",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--sec)}
-.say .fm .st{color:var(--acc);letter-spacing:.05em;font-size:.72rem}
-.say .thumb{flex:none;border:0;padding:.22rem .22rem .6rem;background:#fff;cursor:pointer;rotate:-5deg;
-box-shadow:0 1px 0 rgba(20,38,29,.3),0 7px 10px -6px rgba(0,0,0,.55);transition:rotate .28s cubic-bezier(.34,1.56,.64,1),scale .28s cubic-bezier(.34,1.56,.64,1)}
-.say .thumb:hover,.say .thumb:focus-visible{rotate:-1deg;scale:1.08}
-.say .thumb img{display:block;width:4.2rem;height:3.15rem;object-fit:cover}
 @media (pointer:coarse){.hk .hit{left:-16px;right:-16px;height:calc(100% + 26px)}}
-.lb{position:fixed;inset:0;z-index:100;display:grid;place-items:center;visibility:hidden;pointer-events:none}
-.lb.open{visibility:visible;pointer-events:auto}
-.lb-bg{position:absolute;inset:0;background:rgba(14,26,19,.66);opacity:0;transition:opacity .3s ease;touch-action:none}
-.lb.open .lb-bg{opacity:1}.lb.closing .lb-bg{opacity:0}
-.lb-card{position:relative;margin:0;background:#F6F4E8;padding:.85rem .85rem 1.05rem;border-radius:3px;width:min(94vw,36rem,calc((100svh - 11rem)*var(--r,1.3333)));
-box-shadow:0 26px 50px -18px rgba(0,0,0,.65),0 1px 0 rgba(255,255,255,.4) inset;will-change:transform}
-.lb-card img{display:block;width:100%;aspect-ratio:var(--r,1.3333);object-fit:cover;background:#cfd8cf}
-.lb-card figcaption{margin-top:.8rem;display:flex;flex-direction:column;gap:.4rem;color:var(--ink);padding:0 .15rem}
-.lb-card .t{font:400 1.3rem/1.12 "Young Serif",Georgia,serif}
-.lb-card .m{font:600 .64rem/1.6 "Instrument Sans",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--sec)}
-.lb-card .tape{position:absolute;top:-.85rem;left:50%;width:5.4rem;height:1.55rem;margin-left:-2.7rem;rotate:-3deg;
-background:color-mix(in srgb,var(--acc) 58%,#F6F4E8);opacity:.88;clip-path:polygon(0 8%,4% 0,8% 10%,12% 0,100% 0,96% 12%,100% 24%,96% 38%,100% 52%,96% 66%,100% 80%,96% 92%,100% 100%,0 100%,4% 88%,0 74%,4% 60%,0 46%,4% 32%,0 20%)}
-.lb.open .lb-card figcaption{animation:capIn .4s .3s ease-out both}
-.lb.open .tape{animation:tapeIn .38s .32s cubic-bezier(.34,1.56,.64,1) both}
-@keyframes capIn{from{opacity:0;translate:0 6px}to{opacity:1;translate:0 0}}
-@keyframes tapeIn{from{opacity:0;scale:1.5;translate:0 -10px}to{opacity:.88;scale:1;translate:0 0}}
-.lb-hint{position:absolute;bottom:max(1.3rem,env(safe-area-inset-bottom));left:0;right:0;text-align:center;font:600 .62rem/1 "Instrument Sans",sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#E7E7D3;opacity:0;transition:opacity .4s .5s}
-.lb.open .lb-hint{opacity:.75}.lb.closing .lb-hint{opacity:0;transition-delay:0s}
-.lb-x{position:absolute;top:calc(50% - min(40vh,19rem));right:max(1rem,calc(50% - 13rem));width:2.4rem;height:2.4rem;border-radius:50%;border:1.5px solid var(--ink);background:#F4F2E4;color:var(--ink);font:400 1.3rem/1 "Young Serif",serif;cursor:pointer;display:none}
-.horn{color:var(--acc);margin-left:.15rem;flex:none}
-.horn path{opacity:0}
-li:hover .horn path{animation:blast 1s ease-out both}
-li:hover .horn path:nth-child(2){animation-delay:.12s}
-li:hover .horn path:nth-child(3){animation-delay:.24s}
-@keyframes blast{0%{opacity:0;transform:translateX(-4px)}30%{opacity:1}100%{opacity:0;transform:translateX(4px)}}
-.bough{transform-origin:50% 0}
-.bough:hover{animation:sway 1.8s ease-in-out}
-@keyframes sway{0%{transform:rotate(2deg)}25%{transform:rotate(-6deg)}55%{transform:rotate(5deg)}80%{transform:rotate(-2deg)}100%{transform:rotate(2deg)}}
 :root{--m:clamp(1.25rem,3.6vw,3.2rem)}
 html,body{height:100%;margin:0;overflow:hidden;background:var(--deep)}
 .lost{position:fixed;inset:0;overflow:hidden;color:var(--bg);background:url(/assets/paper-texture.jpg) 0 0/512px 512px,var(--deep);background-blend-mode:multiply}
