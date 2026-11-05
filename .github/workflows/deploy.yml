@@ -28,6 +28,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Test the Letterboxd parser
+        run: python -m unittest discover -s tools -p "test_*.py"
       - name: Refresh film.json from Letterboxd (keeps the committed copy if Letterboxd is down)
         run: python tools/fetch_letterboxd.py --out site/film.json
         continue-on-error: true
