@@ -63,10 +63,17 @@ window.HIKER_LINES = {
 	/* hints toward the easter eggs, keyed by egg (trail, fog, night, rain). about 1 in 5 daytime taps shows one,
 	   picked only from eggs not yet stamped in the trail log, so a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
 	hints: {
-		trail: [],
-		fog: ["the fern has a lot of feelings."],
-		night: ["i hear some mushrooms glow in the dark."],
-		rain: ["stay long enough and the weather turns."]
+		trail: [
+		],
+		fog: [
+			"the fern has a lot of feelings."
+		],
+		night: [
+			"i hear some mushrooms glow in the dark."
+		],
+		rain: [
+			"stay long enough and the weather turns."
+		]
 	},
 	/* same, but only while it is night */
 	night: [
