@@ -1111,19 +1111,21 @@ li:hover .horn path:nth-child(3) {
 }
 
 /* sound toggle */
+/* lives at the right end of the left panel's header rule (.pl .hdr .lab), opposite the site name; the label row ignores
+   pointer events, so the button turns them back on. negative margins keep it from making the header row taller */
 .snd {
-	position: fixed;
-	right: calc(var(--m) - .45rem);
-	bottom: calc(var(--m) - .4rem);
-	z-index: 2;
+	flex: none;
+	align-self: center;
+	margin: -.5rem -.45rem -.5rem 0;
+	pointer-events: auto;
 	width: 2.2rem;
 	height: 2.2rem;
 	padding: .45rem;
-	color: var(--sec);
+	color: var(--bg);
 	background: none;
 	border: 0;
 	cursor: pointer;
-	opacity: .7;
+	opacity: .8;
 	-webkit-tap-highlight-color: transparent
 }
 
@@ -1405,12 +1407,6 @@ body:has(.edark:not(.out)) .tlog {
 	100% {
 		scale: 1
 	}
-}
-
-/* the sound button is fixed in the bottom-right corner at every width; the log pill sits beside it, to its left, on the same line */
-.tlog {
-	right: calc(var(--m) + 2.05rem); /* sound button's right offset + its 2.2rem width + a .3rem gap */
-	bottom: calc(var(--m) - .25rem) /* centres the ~1.9rem pill on the 2.2rem button */
 }
 
 @media (max-width: 760px) {

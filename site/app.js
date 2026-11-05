@@ -118,7 +118,7 @@
     lights: function () { tone(880, 660, .06, .05, 'square') }
   };
   (function () {
-    var b = el('button', 'snd', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5l4.500 4v-13l-4.500 4z" fill="currentColor" stroke="none"/><g class="w-on"><path d="M15.500 9a4 4 0 0 1 0 6"/><path d="M18 6.500a8 8 0 0 1 0 11"/></g><g class="w-off"><path d="M16 9.500l5 5M21 9.500l-5 5"/></g></svg>'), pr = document.querySelector('.pr') || document.body; b.type = 'button';
+    var b = el('button', 'snd', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5l4.500 4v-13l-4.500 4z" fill="currentColor" stroke="none"/><g class="w-on"><path d="M15.500 9a4 4 0 0 1 0 6"/><path d="M18 6.500a8 8 0 0 1 0 11"/></g><g class="w-off"><path d="M16 9.500l5 5M21 9.500l-5 5"/></g></svg>'), pr = document.querySelector('.pl .hdr .lab') || document.body; b.type = 'button';
     function lab() { b.setAttribute('aria-pressed', snd.on ? 'true' : 'false'); b.setAttribute('aria-label', snd.on ? 'sound on (tap to mute)' : 'sound off (tap to turn on)') }
     b.addEventListener('click', function (e) {
       e.stopPropagation(); snd.on = !snd.on; try { localStorage.setItem('rh-snd', snd.on ? '1' : '0') } catch (x) { }
