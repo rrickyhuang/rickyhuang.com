@@ -17,9 +17,7 @@ window.HIKER_LINES = {
 		"whats around the corner?",
 		"one step at a time.",
 		"what a beautiful day!",
-		"wait a moment.",
 		"look around.",
-		"somethings on the horizon.",
 		"watch your step!",
 		"stay hydrated.",
 		"make good choices.",
@@ -33,7 +31,6 @@ window.HIKER_LINES = {
 		"enjoy the journey.",
 		"try something new today!",
 		"be kind.",
-		"enjoy the quiet.",
 		"i wish i was a bird.",
 		"things are looking up.",
 		"change is good.",
@@ -55,20 +52,26 @@ window.HIKER_LINES = {
 	   picked only from eggs not yet stamped in the trail log, so a found egg stops being hinted at. same rules: lowercase, no apostrophes. */
 	hints: {
 		trail: [
-			"lets move a mountain.",
-			"look how far youve come!"
+			"lets move mountains.",
+			"look how far youve come!",
+			"dont give up now!",
+			"somethings on the horizon.",
+			"keep climbing."
 		],
 		fog: [
-			"psst. the fern is ticklish.",
+			"i love ferns.",
 			"plants have feelings too.",
 			"the plants are alive!",
-			"sometimes its nice to talk to a plant."
+			"sometimes its nice to talk to a plant.",
+			"ferns like to be petted."
 		],
 		night: [
 			"i hear some mushrooms glow in the dark.",
 			"my dream job is a mushroom whisperer.",
 			"those mushrooms look delicious!",
-			"check out those mushrooms!"
+			"check out those mushrooms!",
+			"look deep within.",
+			"the mushrooms tell me secrets."
 		],
 		rain: [
 			"stay long enough and the weather turns.",
@@ -76,8 +79,10 @@ window.HIKER_LINES = {
 			"i feel like its gonna rain.",
 			"i think it might rain.",
 			"be patient. the weather changes.",
-			"stay a while.",
-			"is it raining?"
+			"stay for a bit.",
+			"is it raining?",
+			"enjoy the quiet.",
+			"wait a moment.",
 		]
 	},
 	/* same, but only while it is night */
