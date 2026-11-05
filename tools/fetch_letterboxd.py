@@ -44,7 +44,7 @@ def main():
     ap.add_argument("--limit", type=int, default=5)
     a = ap.parse_args()
     req = urllib.request.Request(f"https://letterboxd.com/{a.user}/rss/",
-                                 headers={"User-Agent": f"personal-site-film-feed ({a.user}.github.io)"})
+                                 headers={"User-Agent": "personal-site-film-feed (rickyhuang.com)"})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             films = parse(r.read(), a.limit)

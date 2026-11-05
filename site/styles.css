@@ -69,16 +69,6 @@ a {
 	border-radius: 2px
 }
 
-.paper {
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	z-index: 40;
-	background: url(assets/paper-texture.jpg) 0 0/512px 512px;
-	mix-blend-mode: multiply;
-	opacity: 0
-}
-
 .lab {
 	display: flex;
 	justify-content: space-between;
@@ -87,28 +77,6 @@ a {
 	font: 600 .68rem/1 "Instrument Sans", sans-serif;
 	letter-spacing: .16em;
 	text-transform: uppercase
-}
-
-.rule {
-	margin-top: 1rem;
-	position: relative
-}
-
-.rule.hairline {
-	border-top: 1px solid color-mix(in srgb, var(--ink) 38%, transparent)
-}
-
-.rule.double {
-	height: 5px;
-	border-top: 1px solid color-mix(in srgb, var(--ink) 55%, transparent);
-	border-bottom: 1px solid color-mix(in srgb, var(--ink) 55%, transparent)
-}
-
-.rule.ticks {
-	height: 10px;
-	border-top: 1px solid color-mix(in srgb, var(--ink) 55%, transparent);
-	background: repeating-linear-gradient(to right, color-mix(in srgb, var(--ink) 55%, transparent) 0 1px, transparent 1px 10px) 0 0/100% 5px no-repeat,
-		repeating-linear-gradient(to right, color-mix(in srgb, var(--ink) 55%, transparent) 0 1px, transparent 1px 50px) 0 0/100% 10px no-repeat
 }
 
 h1 {
@@ -202,10 +170,6 @@ li:hover .walker {
 	--u: 1.2rem
 }
 
-.paper {
-	display: none
-}
-
 .hdr {
 	position: relative;
 	border-bottom: 1px solid color-mix(in srgb, var(--ink) 42%, transparent)
@@ -221,289 +185,6 @@ li:hover .walker {
 	position: relative;
 	z-index: 1;
 	pointer-events: none
-}
-
-.hk {
-	position: absolute;
-	left: 0;
-	bottom: 0;
-	z-index: 3;
-	color: var(--sec);
-	transform: translateX(var(--x, 0px));
-	pointer-events: none
-}
-
-.hk .hb {
-	display: block
-}
-
-.hk .walker {
-	display: block;
-	transition: none;
-	transform: scaleX(var(--dir, 1))
-}
-
-.hk .hit {
-	position: absolute;
-	left: -10px;
-	right: -10px;
-	bottom: 0;
-	height: calc(100% + 14px);
-	pointer-events: auto;
-	cursor: pointer;
-	background: none;
-	border: 0;
-	padding: 0
-}
-
-.hk.hop .hb {
-	animation: hop .5s cubic-bezier(.3, .7, .4, 1)
-}
-
-@keyframes hop {
-	0% {
-		transform: none
-	}
-
-	35% {
-		transform: translateY(-7px)
-	}
-
-	70% {
-		transform: none
-	}
-
-	85% {
-		transform: translateY(-2px)
-	}
-
-	100% {
-		transform: none
-	}
-}
-
-.say {
-	position: absolute;
-	bottom: calc(100% + 12px);
-	left: 50%;
-	transform: translate(calc(-50% + var(--bx, 0px)), 0);
-	transform-origin: calc(50% - var(--bx, 0px)) 100%;
-	opacity: 0;
-	scale: .82;
-	rotate: -2deg;
-	translate: 0 6px;
-	pointer-events: none;
-	background: #F4F2E4;
-	color: var(--ink);
-	border: 1.5px solid var(--ink);
-	border-radius: 16px;
-	padding: .6rem .95rem .68rem;
-	font: 400 .95rem/1.28 "Young Serif", Georgia, serif;
-	letter-spacing: 0;
-	text-transform: none;
-	width: max-content;
-	max-width: min(16rem, 76vw);
-	transition: opacity .16s ease, scale .2s ease, rotate .2s ease, translate .2s ease;
-	filter: drop-shadow(2.5px 2.5px 0 rgba(20, 38, 29, .92))
-}
-
-.say.has-photo {
-	max-width: min(17.5rem, 80vw)
-}
-
-.say::after {
-	content: "";
-	position: absolute;
-	top: 100%;
-	left: calc(50% - var(--bx, 0px));
-	width: 11px;
-	height: 11px;
-	background: inherit;
-	border: 1.5px solid var(--ink);
-	border-top: 0;
-	border-left: 0;
-	transform: translate(-50%, -6px) rotate(45deg)
-}
-
-.hk.talk .say {
-	opacity: 1;
-	pointer-events: auto;
-	scale: 1;
-	rotate: var(--rot, -1.5deg);
-	translate: 0 0
-}
-
-.hk.talk .say.v-pop {
-	animation: v-pop .5s cubic-bezier(.3, .9, .4, 1) both
-}
-
-.hk.talk .say.v-bump {
-	animation: v-bump .55s cubic-bezier(.3, .9, .4, 1) both
-}
-
-.hk.talk .say.v-wiggle {
-	animation: v-wiggle .75s ease-out both
-}
-
-.hk.talk .say.v-drop {
-	animation: v-drop .55s cubic-bezier(.3, .9, .4, 1) both
-}
-
-.hk.talk .say.v-swing {
-	animation: v-swing .8s ease-out both
-}
-
-@keyframes v-pop {
-	0% {
-		scale: .8;
-		rotate: -5deg;
-		translate: 0 8px;
-		opacity: 0
-	}
-
-	60% {
-		scale: 1.06;
-		rotate: var(--rot, -1.5deg);
-		translate: 0 -2px;
-		opacity: 1
-	}
-
-	100% {
-		scale: 1;
-		rotate: var(--rot, -1.5deg);
-		translate: 0 0
-	}
-}
-
-@keyframes v-bump {
-	0% {
-		scale: 1 .6;
-		translate: 0 14px;
-		opacity: 0
-	}
-
-	50% {
-		scale: 1.05 1.12;
-		translate: 0 -6px;
-		opacity: 1
-	}
-
-	75% {
-		scale: .98 .96;
-		translate: 0 1px
-	}
-
-	100% {
-		scale: 1;
-		translate: 0 0
-	}
-}
-
-@keyframes v-wiggle {
-	0% {
-		scale: .86;
-		rotate: 0deg;
-		opacity: 0
-	}
-
-	30% {
-		scale: 1.04;
-		rotate: calc(var(--rot, -1.5deg) - 7deg);
-		opacity: 1
-	}
-
-	50% {
-		rotate: calc(var(--rot, -1.5deg) + 6deg)
-	}
-
-	70% {
-		rotate: calc(var(--rot, -1.5deg) - 3deg)
-	}
-
-	85% {
-		rotate: calc(var(--rot, -1.5deg) + 1.5deg)
-	}
-
-	100% {
-		scale: 1;
-		rotate: var(--rot, -1.5deg)
-	}
-}
-
-@keyframes v-drop {
-	0% {
-		translate: 0 -26px;
-		scale: .92;
-		opacity: 0
-	}
-
-	55% {
-		translate: 0 5px;
-		scale: 1.02;
-		opacity: 1
-	}
-
-	75% {
-		translate: 0 -2px
-	}
-
-	100% {
-		translate: 0 0;
-		scale: 1
-	}
-}
-
-@keyframes v-swing {
-	0% {
-		rotate: -16deg;
-		scale: .86;
-		opacity: 0
-	}
-
-	40% {
-		rotate: 8deg;
-		scale: 1.02;
-		opacity: 1
-	}
-
-	65% {
-		rotate: -4deg
-	}
-
-	85% {
-		rotate: 2deg
-	}
-
-	100% {
-		rotate: var(--rot, -1.5deg);
-		scale: 1
-	}
-}
-
-.say .w {
-	display: inline-block;
-	animation: wordIn .3s cubic-bezier(.34, 1.56, .64, 1) both;
-	animation-delay: calc(var(--i)*40ms + 140ms)
-}
-
-@keyframes wordIn {
-	from {
-		opacity: 0;
-		transform: translateY(7px) scale(.9)
-	}
-
-	to {
-		opacity: 1;
-		transform: none
-	}
-}
-
-.say a {
-	color: inherit;
-	text-decoration: underline;
-	text-decoration-color: var(--acc);
-	text-decoration-thickness: 2px;
-	text-underline-offset: 3px
 }
 
 .say .pm {
@@ -562,14 +243,6 @@ li:hover .walker {
 	width: 4.2rem;
 	height: 3.15rem;
 	object-fit: cover
-}
-
-@media (pointer:coarse) {
-	.hk .hit {
-		left: -16px;
-		right: -16px;
-		height: calc(100% + 26px)
-	}
 }
 
 .lb {
@@ -725,45 +398,11 @@ li:hover .walker {
 	color: var(--ink);
 	font: 400 1.3rem/1 "Young Serif", serif;
 	cursor: pointer;
-	display: none
-}
-
-.horn {
-	color: var(--acc);
-	margin-left: .15rem;
-	flex: none
-}
-
-.horn path {
 	opacity: 0
 }
 
-li:hover .horn path {
-	animation: blast 1s ease-out both
-}
-
-li:hover .horn path:nth-child(2) {
-	animation-delay: .12s
-}
-
-li:hover .horn path:nth-child(3) {
-	animation-delay: .24s
-}
-
-@keyframes blast {
-	0% {
-		opacity: 0;
-		transform: translateX(-4px)
-	}
-
-	30% {
-		opacity: 1
-	}
-
-	100% {
-		opacity: 0;
-		transform: translateX(4px)
-	}
+.lb-x:focus-visible {
+	opacity: 1
 }
 
 .bough {
@@ -1049,6 +688,7 @@ li:hover .horn path:nth-child(3) {
 	transform: translate(-50%, 6px) rotate(225deg)
 }
 
+/* 760px is also hardcoded as `narrow` in app.js (hiker walkable width, trail stamp); change both together */
 @media (max-width:760px) {
 	.stage {
 		display: block

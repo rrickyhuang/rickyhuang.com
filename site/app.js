@@ -1,10 +1,11 @@
 (function () {
   var hk = document.querySelector('.hdr .hk'); if (!hk) return;
-  var host = hk.parentNode, FOLLOW = true, W = 15;
-  var legL = hk.querySelector('.legL'), legR = hk.querySelector('.legR'), pole = hk.querySelector('.pole'), bodyg = hk.querySelector('.bodyg'),
+  var host = hk.parentNode, W = 15;
+  var poseParts = Hiker.parts(hk), shuffle = Hiker.shuffle, words = Hiker.words, pickVar = Hiker.pickVar, /* shared with 404.html: hiker.js */
     say = hk.querySelector('.say'), hit = hk.querySelector('.hit');
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-  var eggCur = null, eggTimers = [], sit = 0, sitOn = false; function endEgg() { }
+  /* must match the `@media (max-width:760px)` blocks in styles.css (the single-column layout) */
+  var narrow = matchMedia('(max-width:760px)');
   var x = 0, v = 0, dir = 1, dirS = 1, phase = 0, tx = 0, wait = 0, pause = 2.5, mouseX = null, lastMove = -1e9, since = 0, walking = false, frozen = false, hideT = null, prev = performance.now();
   var VMAX_CHASE = 190, VMAX_STROLL = 34, ACC = 220, DEC = 420, K = 1.8, DEAD = 30, REACT = 180;
   /* ---- words. edit freely. lowercase, no apostrophes. ---- */
@@ -14,8 +15,8 @@
   var PLINES = ["look at this picture i took!", "check out this pic!", "isnt this beautiful?", "look at this shot!", "this is what my camera sees.", "beautiful, eh?", "check it out!", "wanna see a pic i took?", "look at this!", "heres a photo i took!", "i wish i was here again."];
   /* ---- photos. placeholders for now: swap src/title/meta for real ones. ---- */
   var PHOTOS = [];
-  /* ---- last film (letterboxd). film.json is refreshed daily by tools/fetch_letterboxd.py; the copy below is the fallback. ---- */
-  var FILMS = [{ "title": "Wildwood", "year": "2026", "rating": 4.0, "liked": true, "rewatch": false, "watched": "2026-10-27", "url": "https://letterboxd.com/rkyhuang/film/wildwood-2026/" }, { "title": "You Can See Everything", "year": "2026", "rating": 5.0, "liked": true, "rewatch": false, "watched": "2026-10-25", "url": "https://letterboxd.com/rkyhuang/film/you-can-see-everything/" }, { "title": "Primetime", "year": "2026", "rating": 3.5, "liked": false, "rewatch": false, "watched": "2026-10-20", "url": "https://letterboxd.com/rkyhuang/film/primetime-2026/" }, { "title": "The History of Concrete", "year": "2026", "rating": 4.0, "liked": false, "rewatch": false, "watched": "2026-10-17", "url": "https://letterboxd.com/rkyhuang/film/the-history-of-concrete/" }, { "title": "Coward", "year": "2026", "rating": 3.5, "liked": false, "rewatch": false, "watched": "2026-10-11", "url": "https://letterboxd.com/rkyhuang/film/coward-2026/" }], filmI = 0, MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  /* ---- last film (letterboxd). film.json is refreshed daily by tools/fetch_letterboxd.py; the copy committed in the repo is the fallback if the refresh fails. FILMS stays empty (no film bubble) if film.json can't be loaded. ---- */
+  var FILMS = [], filmI = 0, MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   try { fetch('film.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null }).then(function (j) { if (j && j.length) FILMS = j }).catch(function () { }) } catch (e) { }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) }
   function stars(r) { if (!r) return ''; return new Array(Math.floor(r) + 1).join('\u2605') + (r % 1 >= .5 ? '\u00BD' : '') }
@@ -25,18 +26,16 @@
     return '<div class="fm">' + words(lead) + ' <a target="_blank" rel="noopener" href="' + esc(f.url) + '">' + esc(f.title) + '</a><small>' + meta + '</small></div>'
   }
   var capQ = [], lastCap = '';
-  var VARS = ['pop', 'bump', 'wiggle', 'drop', 'swing'], lastVar = '', tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
-  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t } return a }
+  var tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
   function nextNight() { if (!nightQ.length) nightQ = shuffle(NIGHT.slice()); return nightQ.pop() }
   function nextCap() { if (!capQ.length) { capQ = shuffle(PLINES.slice()); if (capQ[capQ.length - 1] === lastCap) { var f = capQ[0]; capQ[0] = capQ[capQ.length - 1]; capQ[capQ.length - 1] = f } } lastCap = capQ.pop(); return lastCap }
   function nextPhoto() { if (!photoQ.length) photoQ = shuffle(PHOTOS.slice()); return photoQ.pop() }
-  function pickVar() { var q; do { q = VARS[Math.floor(Math.random() * VARS.length)] } while (q === lastVar); lastVar = q; return q }
-  function words(t) { return t.split(' ').map(function (w, i) { return '<span class="w" style="--i:' + i + '">' + w + '</span>' }).join(' ') }
-  function hw() { return Math.max(0, host.clientWidth - W - (window.innerWidth > 760 ? 84 : 0)) }
+  /* 84 = room kept clear at the right end of the header for the fern (.pr .hdr .bough in styles.css: 70px wide + right:.2rem + a little air); it is display:none in the narrow layout, so nothing is reserved there */
+  function hw() { return Math.max(0, host.clientWidth - W - (narrow.matches ? 0 : 84)) }
   function clamp(a, lo, hi) { return Math.max(lo, Math.min(hi, a)) }
   function pick() { var t; for (var i = 0; i < 6; i++) { t = Math.random() * hw(); if (Math.abs(t - x) > 50) break } tx = t }
-  if (FOLLOW) addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
+  addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
   x = Math.random() * hw(); pick();
   function arm(ms) { clearTimeout(hideT); hideT = setTimeout(hide, ms) }
   function show() {
@@ -70,7 +69,6 @@
 
   /* ---- easter eggs ---- */
   var lastPX = -1, lastPY = -1, eggs = {}, trailUndo = null, trailCtx = null, nightEl = null, nightEnd = null, fogEnd = null, rainEnd = null, rainDone = false;
-  var PREVIEW = false;
   function el(tag, cls, html) { var e = document.createElement(tag); e.className = cls; if (html != null) e.innerHTML = html; return e }
   function gone(n, ms) { n.classList.add('out'); setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n) }, ms || 700) }
   function below(n) { nightEl && nightEl.parentNode ? document.body.insertBefore(n, nightEl) : document.body.appendChild(n) } /* things that live "in the world" go under the night layer so only the torch reveals them */
@@ -79,7 +77,7 @@
   var REM = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
   /* how dark it is at a distance from a torch hole (matches the mask in css) */
   function dk(d, a, b, c) { a *= REM; b *= REM; c *= REM; return d < a ? 0 : d < b ? .5 * (d - a) / (b - a) : d < c ? .5 + .5 * (d - b) / (c - b) : 1 }
-  function startEgg(n) { if (eggs[n]) eggs[n]() }
+  function startEgg(n) { if (Object.prototype.hasOwnProperty.call(eggs, n) && typeof eggs[n] === 'function') eggs[n]() }
   function egg() { startEgg('trail') }
   function endNight() { var f = nightEnd; nightEnd = null; if (f) f() }
   window.egg = function (n) { startEgg(n) };
@@ -182,7 +180,7 @@
   }
   /* the big stamp thumping down mid-screen. resolves with its box once it has landed and rested. */
   function bigStamp(kind) {
-    var mob = innerWidth <= 760, size = Math.round(Math.min(innerWidth * (mob ? .6 : .68), (mob ? 12 : 15) * REM)), cx = mob ? innerWidth / 2 : innerWidth * .76, cy = innerHeight * (mob ? .27 : .6),
+    var mob = narrow.matches, size = Math.round(Math.min(innerWidth * (mob ? .6 : .68), (mob ? 12 : 15) * REM)), cx = mob ? innerWidth / 2 : innerWidth * .76, cy = innerHeight * (mob ? .27 : .6),
       pl = document.querySelector('.pl'), n = el('div', 'bstamp ' + kind, stampSvg(kind)), box = { n: n, size: size, cx: cx, cy: cy };
     n.style.cssText = 'width:' + size + 'px;height:' + size + 'px;left:' + Math.round(cx - size / 2) + 'px;top:' + Math.round(cy - size / 2) + 'px;color:' + stampOf(kind).ink;
     if (kind === 'night' || (mob && pl && cy < pl.getBoundingClientRect().bottom)) n.classList.add('ondark');
@@ -288,7 +286,7 @@
     var b = e.target.closest && e.target.closest('.bough'); if (!b) return;
     tickles++; clearTimeout(tickleT);
     var a = 1 + .4 * (Math.min(tickles, 3) - 1);
-    if (b.animate) b.animate([{ transform: 'rotate(2deg)' }, { transform: 'rotate(' + (2 - 9 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 8 * a) + 'deg)' }, { transform: 'rotate(' + (2 - 5 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 3 * a) + 'deg)' }, { transform: 'rotate(2deg)' }], { duration: 900, easing: 'ease-out' });
+    if (b.animate && !reduce) b.animate([{ transform: 'rotate(2deg)' }, { transform: 'rotate(' + (2 - 9 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 8 * a) + 'deg)' }, { transform: 'rotate(' + (2 - 5 * a) + 'deg)' }, { transform: 'rotate(' + (2 + 3 * a) + 'deg)' }, { transform: 'rotate(2deg)' }], { duration: 900, easing: 'ease-out' });
     tone(900 + Math.min(tickles, 10) * 70, null, .1, .03, 'triangle');
     if (tickles === 1 && !fogEnd) speak(words('hey, that tickles.'), 2400);
     if (tickles >= TICKLES) { tickles = 0; startEgg('fog') } else tickleT = setTimeout(function () { tickles = 0 }, 4000)
@@ -414,20 +412,15 @@
     setInterval(function () { if (document.visibilityState === 'visible') vis++; if (vis >= ra) { if (rainEnd) { vis = ra - 5; return } vis = 0; ra = again(); startEgg('rain') } }, 1000)
   })();
 
-  if (PREVIEW) {
-    var bar = el('div', 'eggbar', '<span>preview eggs</span>' + ['trail', 'fog', 'night', 'rain', 'film'].map(function (n) { return '<button type="button" data-e="' + n + '">' + n + '</button>' }).join(''));
-    bar.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('button'); if (b) { e.stopPropagation(); var n = b.getAttribute('data-e'); if (n === 'film') { if (FILMS.length) speak(filmHTML(), 7500) } else window.egg(n) } });
-    document.body.appendChild(bar)
-  }
   var hm = location.hash.match(/egg=(\w+)/); if (hm) setTimeout(function () { window.egg(hm[1]) }, 800);
 
   /* ---- lightbox: the print grows out of its thumbnail ---- */
   var lb = null;
   function ensureLB() {
     if (lb) return lb; lb = document.createElement('div'); lb.className = 'lb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'photo');
-    lb.innerHTML = '<div class="lb-bg"></div><figure class="lb-card"><span class="tape"></span><img alt=""><figcaption><span class="t"></span><span class="m"></span></figcaption></figure><span class="lb-hint">tap anywhere to close</span>';
+    lb.innerHTML = '<div class="lb-bg"></div><figure class="lb-card"><span class="tape"></span><img alt=""><figcaption><span class="t"></span><span class="m"></span></figcaption></figure><span class="lb-hint">tap anywhere to close</span><button class="lb-x" type="button" aria-label="close photo">&times;</button>';
     document.body.appendChild(lb);
-    lb.querySelector('.lb-bg').addEventListener('click', closeLB); lb.querySelector('.lb-card').addEventListener('click', closeLB); return lb
+    lb.querySelector('.lb-bg').addEventListener('click', closeLB); lb.querySelector('.lb-card').addEventListener('click', closeLB); lb.querySelector('.lb-x').addEventListener('click', closeLB); return lb
   }
   function collapsed(card) {
     var tr = lastThumb.getBoundingClientRect(), cr = card.getBoundingClientRect();
@@ -437,6 +430,8 @@
     lbOpen = true; lastThumb = thumb; clearTimeout(hideT); var el = ensureLB(), card = el.querySelector('.lb-card');
     card.style.setProperty('--r', ph.ratio || 1.3333); el.querySelector('img').src = ph.src; el.querySelector('.t').textContent = ph.title; el.querySelector('.m').innerHTML = ph.meta.join('<br>');
     el.classList.remove('closing'); el.classList.add('open');
+    /* modal: park the page behind it (inert also keeps Tab inside) and put focus on the close button, which is only drawn while it has keyboard focus */
+    var stage = document.querySelector('.stage'); if (stage) stage.inert = true; try { el.querySelector('.lb-x').focus({ preventScroll: true }) } catch (e) { }
     card.style.transition = 'none'; card.style.transform = 'none';
     var start = collapsed(card); card.style.transform = start; void card.offsetWidth;
     card.style.transition = reduce ? 'none' : 'transform .6s cubic-bezier(.3,1.3,.5,1)';
@@ -445,29 +440,23 @@
   function closeLB() {
     if (!lbOpen) return; var card = lb.querySelector('.lb-card');
     card.style.transition = reduce ? 'none' : 'transform .34s cubic-bezier(.5,0,.8,.4)'; card.style.transform = collapsed(card); lb.classList.add('closing');
-    setTimeout(function () { lb.classList.remove('open', 'closing'); lbOpen = false; arm(900); try { hit.focus({ preventScroll: true }) } catch (e) { } }, reduce ? 0 : 350)
+    setTimeout(function () { lb.classList.remove('open', 'closing'); lbOpen = false; var stage = document.querySelector('.stage'); if (stage) stage.inert = false; arm(900); try { hit.focus({ preventScroll: true }) } catch (e) { } }, reduce ? 0 : 350)
   }
   hit.addEventListener('click', function (e) { e.stopPropagation(); show() });
   document.addEventListener('click', function (e) { if (!hk.contains(e.target) && !(e.target.closest && e.target.closest('.nite, .bough'))) hide() }); /* the fern talks via the tickle handler, so don't close the bubble it just opened */
   addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (lbOpen) closeLB(); else hide() } });
   say.addEventListener('mouseenter', function () { if (!lbOpen) clearTimeout(hideT) });
   say.addEventListener('mouseleave', function () { if (hk.classList.contains('talk') && !lbOpen) arm(1400) });
-  function pose(amp) {
-    var s = Math.sin(phase) * 28 * amp, b = Math.abs(Math.sin(phase)) * 1.3 * amp, lean = Math.min(1, Math.abs(v) / VMAX_CHASE) * 5, k = sit, ls = s * (1 - k);
-    legL.setAttribute('transform', 'rotate(' + (ls - 84 * k).toFixed(1) + ' 11 22)');
-    legR.setAttribute('transform', 'rotate(' + (-ls - 70 * k).toFixed(1) + ' 11 22)');
-    pole.setAttribute('transform', 'translate(0 ' + (-k * 15.5).toFixed(2) + ') rotate(' + (-s * .35 * (1 - k)).toFixed(1) + ' 18.5 17)');
-    bodyg.setAttribute('transform', 'translate(0 ' + (-b + k * 15.5).toFixed(2) + ') rotate(' + lean.toFixed(1) + ' 11 38)')
-  }
+  function pose(amp) { Hiker.pose(poseParts, phase, amp, Math.min(1, Math.abs(v) / VMAX_CHASE) * 5) }
   function frame(t) {
     var dt = Math.min(.05, (t - prev) / 1000); prev = t;
-    var following = FOLLOW && mouseX !== null && t - lastMove < 5000;
+    var following = mouseX !== null && t - lastMove < 5000;
     var target = following ? clamp(mouseX, 0, hw()) : tx, dist = target - x, ad = Math.abs(dist);
     if (following) {
       if (!walking) { if (ad > DEAD) { if (!since) since = t; if (t - since > REACT) walking = true } else since = 0 }
       else if (ad < 3) { walking = false; since = 0 }
     } else { walking = ad > 1.5; since = 0 }
-    if (frozen || sitOn) walking = false; sit += ((sitOn ? 1 : 0) - sit) * Math.min(1, dt * 8);
+    if (frozen) walking = false;
     var vmax = following ? VMAX_CHASE : VMAX_STROLL;
     var desired = walking ? (dist > 0 ? 1 : -1) * Math.min(vmax, ad * K) : 0;
     var a = (Math.abs(desired) > Math.abs(v) && (desired * v >= 0)) ? ACC : DEC;
@@ -477,7 +466,7 @@
     dirS += (dir - dirS) * Math.min(1, dt * 12);
     phase += Math.abs(v) * dt / 6;
     pose(Math.min(1, Math.abs(v) / 55));
-    if (!walking && !following && !frozen && !sitOn && Math.abs(v) < 1) { wait += dt; if (wait > pause) { wait = 0; pause = 2 + Math.random() * 3; pick() } }
+    if (!walking && !following && !frozen && Math.abs(v) < 1) { wait += dt; if (wait > pause) { wait = 0; pause = 2 + Math.random() * 3; pick() } }
     hk.style.setProperty('--x', x.toFixed(1) + 'px'); hk.style.setProperty('--dir', dirS.toFixed(3));
     requestAnimationFrame(frame)
   }
