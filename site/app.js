@@ -29,10 +29,13 @@
   var tapN = 0, textQ = [], nightQ = [], photoQ = [], lastText = '', lbOpen = false, lastThumb = null;
   function nextText() { if (!textQ.length) { textQ = shuffle(POOL.slice()); if (textQ[textQ.length - 1] === lastText) { var f = textQ[0]; textQ[0] = textQ[textQ.length - 1]; textQ[textQ.length - 1] = f } } lastText = textQ.pop(); return lastText }
   /* egg hints (lines.js: hints.<egg>): about 1 in 5 taps (day or night), drawn only from eggs that have not been stamped yet. keys match the egg names (trail, fog, night, rain). */
-  var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = {}, lastHint = '', lastEgg = '';
+  var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = {}, warnedHint = {}, lastHint = '', lastEgg = '';
   /* picks an unfound egg first (never the same one twice running if another is open), then a line from that egg's own shuffled queue, so every egg gets equal airtime however many lines it has */
   function nextHint() {
-    var open = Object.keys(HINTS).filter(function (k) { return !TL.have[k] && HINTS[k] && HINTS[k].length });
+    var open = Object.keys(HINTS).filter(function (k) {
+      if (!stampOf(k)) { if (!warnedHint[k]) { warnedHint[k] = 1; console.warn('lines.js: hints.' + k + ' is not an egg name (' + STAMPS.map(function (s) { return s.k }).join(', ') + '), so its lines are ignored') } return false }
+      return !TL.have[k] && HINTS[k] && HINTS[k].length
+    });
     if (!open.length) return null;
     var pool = open.length > 1 ? open.filter(function (k) { return k !== lastEgg }) : open, k = pool[Math.floor(Math.random() * pool.length)], q = hintQ[k];
     if (!q || !q.length) { q = hintQ[k] = shuffle(HINTS[k].slice()); if (q.length > 1 && q[q.length - 1] === lastHint) { var f = q[0]; q[0] = q[q.length - 1]; q[q.length - 1] = f } }
