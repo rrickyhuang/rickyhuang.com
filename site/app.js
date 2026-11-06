@@ -294,6 +294,11 @@
     fogEnd = function () { T.clear(); fogEnd = null; if (stop) stop(.6); gone(f, 1200) }
   };
   var tickles = 0, tickleT = null, TICKLES = 10; /* fern clicks needed for fog */
+  /* the fern is a role=button svg, so Enter and Space shake it like a click (an svg has no click() of its own) */
+  document.addEventListener('keydown', function (e) {
+    var b = e.target.closest && e.target.closest('.bough'); if (!b || (e.key !== 'Enter' && e.key !== ' ')) return;
+    e.preventDefault(); if (!e.repeat) b.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+  });
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.bough'); if (!b) return;
     tickles++; clearTimeout(tickleT);
