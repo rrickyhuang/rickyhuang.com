@@ -48,7 +48,10 @@
   function hw() { return Math.max(0, host.clientWidth - W - (narrow.matches ? 0 : 84)) }
   function clamp(a, lo, hi) { return Math.max(lo, Math.min(hi, a)) }
   function pick() { var t; for (var i = 0; i < 6; i++) { t = Math.random() * hw(); if (Math.abs(t - x) > 50) break } tx = t }
-  addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
+  /* the land acknowledgement (.loc) opens on hover, and his hit area would steal that hover when he chases the cursor onto it: while the pointer is over the label, or the card is open, he stops chasing and strolls clear of the label */
+  var locEl = document.querySelector('.loc'), px = null, py = null;
+  function inRect(r, pad) { return px >= r.left - pad && px <= r.right + pad && py >= r.top - pad && py <= r.bottom + pad }
+  addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; px = e.clientX; py = e.clientY; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
   x = Math.random() * hw(); pick();
   function arm(ms) { clearTimeout(hideT); hideT = setTimeout(hide, ms) }
   function show() {
@@ -469,7 +472,17 @@
   function pose(amp) { Hiker.pose(poseParts, phase, amp, Math.min(1, Math.abs(v) / VMAX_CHASE) * 5) }
   function frame(t) {
     var dt = Math.min(.05, (t - prev) / 1000); prev = t;
-    var following = mouseX !== null && t - lastMove < 5000;
+    var onLab = false;
+    if (locEl) {
+      var lr = locEl.getBoundingClientRect(), shown = locEl.classList.contains('open') || locEl.matches(':hover'), ack = shown && locEl.querySelector('.ack');
+      onLab = px !== null && (inRect(lr, 14) || (ack && inRect(ack.getBoundingClientRect(), 0)));
+      if (onLab && !frozen) { /* keep his walk target out of the label's span, on whichever side is nearer and fits */
+        var hl = host.getBoundingClientRect().left, lo = lr.left - hl - W - 14, hi = lr.right - hl + 14;
+        if (tx > lo && tx < hi) { var fl = lo >= 0, fr = hi <= hw(); tx = fl && (!fr || x - lo < hi - x) ? lo : fr ? hi : tx }
+      }
+      if (shown && locEl.classList.contains('open')) onLab = true
+    }
+    var following = mouseX !== null && t - lastMove < 5000 && !onLab;
     var target = following ? clamp(mouseX, 0, hw()) : tx, dist = target - x, ad = Math.abs(dist);
     if (following) {
       if (!walking) { if (ad > DEAD) { if (!since) since = t; if (t - since > REACT) walking = true } else since = 0 }
