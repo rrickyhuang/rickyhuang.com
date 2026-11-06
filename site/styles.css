@@ -752,11 +752,12 @@ li:hover .walker {
 
 /* sound toggle */
 /* lives at the right end of the left panel's header rule (.pl .hdr .lab), opposite the site name; the label row ignores
-   pointer events, so the button turns them back on. negative margins keep it from making the header row taller */
+   pointer events, so the button turns them back on. the equal negative top and bottom margins (more than the button is
+   taller than the site name) keep it from making the header row taller, so both header rules sit at the same height */
 .snd {
 	flex: none;
 	align-self: center;
-	margin: -.5rem -.45rem -.5rem 0;
+	margin: -1rem -.45rem -1rem 0;
 	pointer-events: auto;
 	width: 2.2rem;
 	height: 2.2rem;
