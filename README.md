@@ -53,6 +53,12 @@ Workflow: export from Darktable (sRGB JPEG, 2400 px long edge, geo tags off), th
                           alt text here, new photos get a stub entry. Commit it: it is the source
                           of that text, and the next run merges it into photos.json.
 
+Tests: `tools/test_prep_photos.py` checks the privacy scrub (`clean_exif()` and `verify()`). They need Pillow, so they
+skip themselves where it is not installed, and the deploy workflow does not install it, so they do **not** run in CI. Run
+them by hand after any change to `prep_photos.py`. Decided not to add `pip install pillow` to the deploy job for now because
+there are no photos and no gallery yet. Revisit when real photos go on the site: install a pinned Pillow version before the
+test step in `.github/workflows/deploy.yml` so the tests guard the deploy.
+
 Nothing reads `photos.json` yet. Until the gallery exists, the hiker's photo bubbles stay off while
 `PHOTOS` in `site/app.js` is empty; to try one, add entries to `PHOTOS` by hand (`src`, `title`,
 `meta`, optional `ratio`). The hero photo on the left panel is `site/assets/hero-forest.jpg`.

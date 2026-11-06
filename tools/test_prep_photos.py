@@ -4,7 +4,9 @@ Tests for the privacy scrub in prep_photos.py: clean_exif() decides what metadat
 and verify() is the last guard that stops a file with location data being published.
 
 Needs Pillow (pip install pillow); skipped when it is not installed, so the stdlib-only
-run in the deploy workflow is unaffected. Run from the repo root with
+run in the deploy workflow is unaffected. That also means CI does not run them: run them
+by hand after changing prep_photos.py. Revisit (pinned Pillow install in deploy.yml) once
+real photos go on the site; see the Photos section of the README. Run from the repo root with
 
     python -m unittest discover -s tools -p "test_*.py"
 """
