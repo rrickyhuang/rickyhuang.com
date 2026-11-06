@@ -18,6 +18,16 @@ Personal landing page. Plain static files in `site/`, published with GitHub Page
 
     python3 -m http.server -d site 8000      # then open http://localhost:8000
 
+## Testing the easter eggs
+
+These hooks ship with the site, so anyone can use them (the stamps live in memory and clear on refresh):
+
+    #egg=<name>           add to the URL, e.g. http://localhost:8000/#egg=fog: starts that egg 0.8 s after load
+                          (name is trail, fog, night or rain; anything else does nothing)
+    #rain=<seconds>       the rain egg's first shower after this many seconds of visible time, then
+                          every that many seconds (otherwise 3 min, then about every 8-10 min)
+    window.egg('<name>')  the same egg start, from the browser console
+
 ## Deploy
 
 Repo Settings > Pages > Source: **GitHub Actions**, custom domain `rickyhuang.com`.
