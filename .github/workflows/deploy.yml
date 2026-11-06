@@ -31,8 +31,15 @@ jobs:
       - name: Test the Letterboxd parser
         run: python -m unittest discover -s tools -p "test_*.py"
       - name: Refresh film.json from Letterboxd (keeps the committed copy if Letterboxd is down)
+        id: film
         run: python tools/fetch_letterboxd.py --out site/film.json
         continue-on-error: true
+      - name: Flag a failed film.json refresh
+        if: steps.film.outcome == 'failure'
+        run: |
+          echo "::warning title=film.json not refreshed::tools/fetch_letterboxd.py failed, so the committed site/film.json is being published. See the previous step's log."
+          echo "### film.json not refreshed" >> "$GITHUB_STEP_SUMMARY"
+          echo "tools/fetch_letterboxd.py failed, so the copy of \`site/film.json\` committed in the repo was published instead." >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
