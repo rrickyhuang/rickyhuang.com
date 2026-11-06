@@ -18,6 +18,16 @@ Personal landing page. Plain static files in `site/`, published with GitHub Page
 
     python3 -m http.server -d site 8000      # then open http://localhost:8000
 
+## Testing the easter eggs
+
+These hooks ship with the site, so anyone can use them (the stamps live in memory and clear on refresh):
+
+    #egg=<name>           add to the URL, e.g. http://localhost:8000/#egg=fog: starts that egg 0.8 s after load
+                          (name is trail, fog, night or rain; anything else does nothing)
+    #rain=<seconds>       the rain egg's first shower after this many seconds of visible time, then
+                          every that many seconds (otherwise 3 min, then about every 8-10 min)
+    window.egg('<name>')  the same egg start, from the browser console
+
 ## Deploy
 
 Repo Settings > Pages > Source: **GitHub Actions**, custom domain `rickyhuang.com`.
@@ -42,6 +52,12 @@ Workflow: export from Darktable (sRGB JPEG, 2400 px long edge, geo tags off), th
     photos.meta.json      in the folder you run it from (repo root); hand-edit titles, places and
                           alt text here, new photos get a stub entry. Commit it: it is the source
                           of that text, and the next run merges it into photos.json.
+
+Tests: `tools/test_prep_photos.py` checks the privacy scrub (`clean_exif()` and `verify()`). They need Pillow, so they
+skip themselves where it is not installed, and the deploy workflow does not install it, so they do **not** run in CI. Run
+them by hand after any change to `prep_photos.py`. Decided not to add `pip install pillow` to the deploy job for now because
+there are no photos and no gallery yet. Revisit when real photos go on the site: install a pinned Pillow version before the
+test step in `.github/workflows/deploy.yml` so the tests guard the deploy.
 
 Nothing reads `photos.json` yet. Until the gallery exists, the hiker's photo bubbles stay off while
 `PHOTOS` in `site/app.js` is empty; to try one, add entries to `PHOTOS` by hand (`src`, `title`,

@@ -32,7 +32,7 @@
   var HINTS = (window.HIKER_LINES && window.HIKER_LINES.hints) || {}, HINT_CHANCE = .2, hintQ = {}, lastHint = '', lastEgg = '';
   /* picks an unfound egg first (never the same one twice running if another is open), then a line from that egg's own shuffled queue, so every egg gets equal airtime however many lines it has */
   function nextHint() {
-    var open = Object.keys(HINTS).filter(function (k) { return !TL.have[k] && HINTS[k] && HINTS[k].length });
+    var open = Object.keys(HINTS).filter(function (k) { return stampOf(k) && !TL.have[k] && HINTS[k] && HINTS[k].length });
     if (!open.length) return null;
     var pool = open.length > 1 ? open.filter(function (k) { return k !== lastEgg }) : open, k = pool[Math.floor(Math.random() * pool.length)], q = hintQ[k];
     if (!q || !q.length) { q = hintQ[k] = shuffle(HINTS[k].slice()); if (q.length > 1 && q[q.length - 1] === lastHint) { var f = q[0]; q[0] = q[q.length - 1]; q[q.length - 1] = f } }
@@ -45,7 +45,12 @@
   function hw() { return Math.max(0, host.clientWidth - W - (narrow.matches ? 0 : 84)) }
   function clamp(a, lo, hi) { return Math.max(lo, Math.min(hi, a)) }
   function pick() { var t; for (var i = 0; i < 6; i++) { t = Math.random() * hw(); if (Math.abs(t - x) > 50) break } tx = t }
-  addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
+  /* the land acknowledgement (.loc) opens on hover, and his hit area would steal that hover when he chases the cursor onto it: while the pointer is over the label, or the card is open, he stops chasing and strolls clear of the label */
+  var locEl = document.querySelector('.loc'), ackEl = locEl && locEl.querySelector('.ack'), px = null, py = null;
+  function noPointer() { px = py = null } /* touch, leaving the window and losing focus all mean the last position no longer says where the pointer is */
+  function inRect(r, pad) { return px >= r.left - pad && px <= r.right + pad && py >= r.top - pad && py <= r.bottom + pad }
+  addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') { noPointer(); return } px = e.clientX; py = e.clientY; mouseX = e.clientX - host.getBoundingClientRect().left - W / 2; lastMove = performance.now() }, { passive: true });
+  document.documentElement.addEventListener('pointerleave', noPointer); addEventListener('blur', noPointer);
   x = Math.random() * hw(); pick();
   function arm(ms) { clearTimeout(hideT); hideT = setTimeout(hide, ms) }
   function show() {
@@ -146,6 +151,8 @@
     { k: 'rain', name: 'rain or shine', ink: '#4D7370' }
   ], stampUid = 0;
   function stampOf(k) { for (var i = 0; i < STAMPS.length; i++) if (STAMPS[i].k === k) return STAMPS[i] }
+  /* a mistyped egg key in lines.js hints would never be stamped, so warn once at load; nextHint() ignores keys that are not eggs */
+  Object.keys(HINTS).forEach(function (k) { if (!stampOf(k)) console.warn('lines.js: hints.' + k + ' is not an egg name (' + STAMPS.map(function (e) { return e.k }).join(', ') + '), so its lines are ignored') });
   function oct(r) { var p = []; for (var i = 0; i < 8; i++) { var a = (22.5 + 45 * i) * Math.PI / 180; p.push((100 + r * Math.cos(a)).toFixed(1) + ',' + (100 + r * Math.sin(a)).toFixed(1)) } return p.join(' ') }
   function stampShape(k, a) {
     if (k === 'trail') return '<circle cx="100" cy="100" r="95" ' + a + '/>';
@@ -294,6 +301,13 @@
     fogEnd = function () { T.clear(); fogEnd = null; if (stop) stop(.6); gone(f, 1200) }
   };
   var tickles = 0, tickleT = null, TICKLES = 10; /* fern clicks needed for fog */
+  /* the fern is a role=button svg, so it acts like a native button: Enter on keydown, Space on keyup (keydown only stops the page scrolling), and never with a shortcut modifier held. an svg has no click() of its own */
+  function fernKey(e) { var b = e.target.closest && e.target.closest('.bough'); return b && !e.ctrlKey && !e.metaKey && !e.altKey && !e.defaultPrevented ? b : null }
+  document.addEventListener('keydown', function (e) {
+    var b = fernKey(e); if (!b) return;
+    if (e.key === 'Enter') { if (!e.repeat) b.dispatchEvent(new MouseEvent('click', { bubbles: true })) } else if (e.key === ' ') e.preventDefault()
+  });
+  document.addEventListener('keyup', function (e) { var b = e.key === ' ' && fernKey(e); if (b) b.dispatchEvent(new MouseEvent('click', { bubbles: true })) });
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('.bough'); if (!b) return;
     tickles++; clearTimeout(tickleT);
@@ -461,7 +475,16 @@
   function pose(amp) { Hiker.pose(poseParts, phase, amp, Math.min(1, Math.abs(v) / VMAX_CHASE) * 5) }
   function frame(t) {
     var dt = Math.min(.05, (t - prev) / 1000); prev = t;
-    var following = mouseX !== null && t - lastMove < 5000;
+    var onLab = false, open = !!locEl && locEl.classList.contains('open');
+    if (locEl && (px !== null || open)) { /* nothing is read on touch devices, or while the pointer is elsewhere and the card is closed */
+      var lr = locEl.getBoundingClientRect();
+      if (px !== null) onLab = inRect(lr, 14) || (ackEl && (open || locEl.matches(':hover')) && inRect(ackEl.getBoundingClientRect(), 0));
+      if ((onLab || open) && !frozen) { /* keep his walk target out of the label's span (so he never parks on it, open card or not): the nearer side if both fit, else the side with more room */
+        var hl = host.getBoundingClientRect().left, lo = lr.left - hl - W - 14, hi = lr.right - hl + 14, mx = hw();
+        if (tx > lo && tx < hi) { var rl = lo, rr = mx - hi; tx = clamp((rl >= 0 && rr >= 0) ? (x - lo < hi - x ? lo : hi) : (rl >= rr ? lo : hi), 0, mx) }
+      }
+    }
+    var following = mouseX !== null && t - lastMove < 5000 && !onLab;
     var target = following ? clamp(mouseX, 0, hw()) : tx, dist = target - x, ad = Math.abs(dist);
     if (following) {
       if (!walking) { if (ad > DEAD) { if (!since) since = t; if (t - since > REACT) walking = true } else since = 0 }
