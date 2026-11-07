@@ -427,7 +427,7 @@
       raf = requestAnimationFrame(loop)
     }
     raf = requestAnimationFrame(loop);
-    T.at(function () { ending = 1; if (stopBed) stopBed(4); speak(words('smells like cedar now.'), 3600) }, 34000);
+    T.at(function () { ending = 1; if (stopBed) stopBed(4); speak(words('i love the smell of a forest after it rains.'), 3600) }, 34000);
     function finish() { alive = false; cancelAnimationFrame(raf); removeEventListener('resize', size); T.clear(); rainEnd = null; if (c.parentNode) c.parentNode.removeChild(c); gone(umb, 400); hk.classList.remove('rainy') }
     rainEnd = function () { ending = 1; if (stopBed) stopBed(.5); setTimeout(finish, 300) }
   };
